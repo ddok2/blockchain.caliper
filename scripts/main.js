@@ -48,10 +48,10 @@ async function main() {
     //     return;
     // }
 
-    process.env.OVERWRITE_GOPATH = false;
+    // process.env.OVERWRITE_GOPATH = true;
 
-    let absConfigFile = path.join(__dirname, '../nuri/config.yaml');
-    let absNetworkFile = path.join(__dirname, '../nuri/fabric-go-tls.json');
+    let absConfigFile = path.join(__dirname, '../network/nuritelecom/exchange-bc-tls/config.yaml');
+    let absNetworkFile = path.join(__dirname, '../network/nuritelecom/exchange-bc-tls/fabric-go-tls.json');
 
     const framework = require('../src/comm/bench-flow.js');
     try {

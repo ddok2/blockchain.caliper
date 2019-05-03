@@ -61,7 +61,7 @@ module.exports.storePathForOrg = function(org) {
 module.exports.setupChaincodeDeploy = function() {
     if (typeof process.env.OVERWRITE_GOPATH === 'undefined' ||
         process.env.OVERWRITE_GOPATH.toString().toUpperCase() === 'TRUE') {
-        process.env.GOPATH = commUtils.resolvePath('src/contract');
+        process.env.GOPATH = commUtils.resolvePath('.');
     }
 };
 

@@ -1,0 +1,67 @@
+{
+  "caliper": {
+    "blockchain": "fabric",
+    "command" : {
+      "start": "docker-compose -f network/nuritelecom/exchange-bc-tls/docker-compose.yml up -d;sleep 3s",
+      "end" : "docker-compose -f network/nuritelecom/exchange-bc-tls/docker-compose.yml down;docker rm $(docker ps -aq);docker rmi $(docker images dev* -q)"
+    }
+  },
+  "fabric": {
+    "cryptodir": "network/nuritelecom/exchange-bc-tls/crypto-config",
+    "network": {
+      "orderer": {
+        "url": "grpcs://0.0.0.0:7050",
+        "mspid": "OrdererMSP",
+        "msp": "network/nuritelecom/exchange-bc-tls/crypto-config/ordererOrganizations/example.com/msp/",
+        "server-hostname": "orderer.example.com",
+        "tls_cacerts": "network/nuritelecom/exchange-bc-tls/crypto-config/ordererOrganizations/example.com/orderers/orderer.example.com/tls/ca.crt"
+      },
+      "org1": {
+        "name": "peer0.org1.example.com",
+        "mspid": "Org1MSP",
+        "msp": "network/nuritelecom/exchange-bc-tls/crypto-config/peerOrganizations/org1.example.com/msp/",
+        "ca": {
+          "url": "https://0.0.0.0:7054",
+          "name": "ca.example.com"
+        },
+        "peer1": {
+          "requests": "grpcs://0.0.0.0:7051",
+          "events": "grpcs://0.0.0.0:7053",
+          "server-hostname": "peer0.org1.example.com",
+          "tls_cacerts": "network/nuritelecom/exchange-bc-tls/crypto-config/peerOrganizations/org1.example.com/peers/peer0.org1.example.com/tls/ca.crt"
+        }
+      }
+    },
+    "channel": [
+      {
+        "name": "mychannel",
+        "deployed": false,
+        "config": "network/nuritelecom/exchange-bc-tls/config/channel.tx",
+        "organizations": ["org1"]
+      }
+    ],
+    "chaincodes": [
+      {"id": "exchange", "path": "github.com/chaincode/exchange-ex", "language":"golang", "version": "1.0", "channel": "mychannel"}
+    ],
+    "endorsement-policy": {
+      "identities": [
+        {
+          "role": {
+            "name": "member",
+            "mspId": "Org1MSP"
+          }
+        }
+      ],
+      "policy": { "1-of": [{"signed-by": 0}]}
+    },
+    "context": {
+      "registerMember": "mychannel"
+    }
+  },
+  "info" : {
+    "Version": "1.4.1",
+    "Size": "1 Orgs with 1 Peers",
+    "Orderer": "Solo",
+    "Distribution": "NURI Telecom Exchange-bc-tls"
+  }
+}

@@ -1,67 +1,70 @@
-/**
-* Copyright 2017 HUAWEI. All Rights Reserved.
-*
-* SPDX-License-Identifier: Apache-2.0
-*
-*/
-
+/*
+ * Copyright 2019. Nuri Telecom. All Rights Reserved.
+ *
+ * - main.js
+ * - author: Sungyub NA <mailto: syna@nuritelecom.com>
+ */
 
 'use strict';
 
-var path = require('path');
-var fs = require('fs-extra');
-var exec = require('child_process').exec;
-const Util = require('../src/comm/util');
+const path = require('path');
+const fs = require('fs-extra');
+const logger = require('../src/comm/util').getLogger('scripts/main.js');
+
+const framework = require('../src/comm/bench-flow.js');
+const program = require('commander');
 
 async function main() {
-    // let program = require('commander');
-    // program
-    //     .allowUnknownOption()
-    //     .option('-c, --config <file>', 'config file of the benchmark')
-    //     .option('-n, --network <file>', 'config file of the blockchain system under test')
-    //     .parse(process.argv);
-    //
-    let logger = Util.getLogger('scripts/main.js');
-    // let absConfigFile;
-    // if(typeof program.config === 'undefined') {
-    //   logger.error('config file is required');
-    //   return;
-    // }
-    // else {
-    //     absConfigFile = path.isAbsolute(program.config) ? program.config : path.join(__dirname, '/../', program.config);
-    // }
-    // if(!fs.existsSync(absConfigFile)) {
-    //     logger.error('file ' + absConfigFile + ' does not exist');
-    //     return;
-    // }
-    //
-    // let absNetworkFile;
-    // if(typeof program.network === 'undefined') {
-    //     logger.error('network file is required');
-    //     return;
-    // }
-    // else {
-    //     absNetworkFile = path.isAbsolute(program.network) ? program.network : path.join(__dirname, '/../', program.network);
-    // }
-    // if(!fs.existsSync(absNetworkFile)) {
-    //     logger.error('file ' + absNetworkFile + ' does not exist');
-    //     return;
-    // }
 
-    // process.env.OVERWRITE_GOPATH = true;
+  // program.allowUnknownOption().
+  //     option('-c, --config <file>', 'config file of the benchmark').
+  //     option('-n, --network <file>',
+  //         'config file of the blockchain system under test').
+  //     parse(process.argv);
 
-    let absConfigFile = path.join(__dirname, '../network/nuritelecom/exchange-bc-tls/config.yaml');
-    let absNetworkFile = path.join(__dirname, '../network/nuritelecom/exchange-bc-tls/fabric-go-tls.json');
+  let absConfigFile;
+  // if (typeof program.config === 'undefined') {
+  //   logger.error('config file is required');
+  //   return;
+  // } else {
+  //   absConfigFile = path.isAbsolute(program.config) ?
+  //       program.config :
+  //       path.join(__dirname, '/../', program.config);
+  // }
+  // if (!fs.existsSync(absConfigFile)) {
+  //   logger.error('file ' + absConfigFile + ' does not exist');
+  //   return;
+  // }
 
-    const framework = require('../src/comm/bench-flow.js');
-    try {
-        await framework.run(absConfigFile, absNetworkFile);
-        logger.info('Benchmark run successfully');
-        process.exit(0);
-    } catch (err) {
-        logger.error(`Error while executing the benchmark: ${err.stack ? err.stack : err}`);
-        process.exit(1);
-    }
+  let absNetworkFile;
+  // if (typeof program.network === 'undefined') {
+  //   logger.error('network file is required');
+  //   return;
+  // } else {
+  //   absNetworkFile = path.isAbsolute(program.network) ?
+  //       program.network :
+  //       path.join(__dirname, '/../', program.network);
+  // }
+  // if (!fs.existsSync(absNetworkFile)) {
+  //   logger.error('file ' + absNetworkFile + ' does not exist');
+  //   return;
+  // }
+
+  absConfigFile = path.join(__dirname,
+      '../network/nuritelecom/exchange-bc-tls/config.yaml');
+  absNetworkFile = path.join(__dirname,
+      '../network/nuritelecom/exchange-bc-tls/fabric-go-tls.json');
+
+  try {
+    await framework.run(absConfigFile, absNetworkFile);
+    logger.info('Benchmark run successfully');
+    process.exit(0);
+  } catch (err) {
+    logger.error(`Error while executing the benchmark: ${err.stack ?
+        err.stack :
+        err}`);
+    process.exit(1);
+  }
 }
 
 main();

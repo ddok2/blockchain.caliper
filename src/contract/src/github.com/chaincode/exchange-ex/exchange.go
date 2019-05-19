@@ -24,6 +24,14 @@ const (
 	ERROR = 500
 )
 
+const (
+	START_IDX            = 1
+	TX_ID_OFFSET         = 1
+	TX_ARGS_OFFSET       = 2
+	REGISTER_MEMBER_ARGS = 7
+	TRANSFER_COIN_ARGS   = 5
+)
+
 type SmartContract struct{}
 
 func main() {
@@ -85,8 +93,87 @@ func (t *SmartContract) batchProcess(stub shim.ChaincodeStubInterface, args []st
 	txArrayListCount, _ := strconv.Atoi(args[0])
 	txArgsCount := 0
 	idxArrayList := 0
+	idx := START_IDX
+	i := 0
+
+	type Result struct {
+		UUID string `json:"uuid`
+		Code string `json:"code"`
+	}
+
+	type ResultList struct {
+		Results []*Result `json:"results"`
+	}
+
+	resultList := ResultList{}
+
+	for idxArrayList < txArrayListCount {
+		startIdx := idx + TX_ARGS_OFFSET
+		id := idx + TX_ID_OFFSET
+		uuididx := idx
+		switch args[id] {
+		case "1":
+			txArgsCount = REGISTER_MEMBER_ARGS
+		case "2":
+			txArgsCount = TRANSFER_COIN_ARGS
+		}
+
+		idx += TX_ARGS_OFFSET + txArgsCount
+		i = 0
+		txArgs := make([]string, txArgsCount)
+		for startIdx < idx {
+			txArgs[i] = args[startIdx]
+			startIdx++
+			i++
+		}
+
+		logger.Infof("args[%d]: %s", id, args[id])
+
+		result := new(Result)
+
+		switch args[id] {
+		case "1":
+			result.Code = t.batchRegisterMember(stub, txArgs)
+		case "2":
+			result.Code = t.batchTransferCoin(stub, txArgs)
+		}
+
+		result.UUID = args[uuididx]
+		resultList.Results = append(resultList.Results, result)
+
+		idxArrayList++
+
+	}
+
+	eventPayload := "Test Event"
+	if err := stub.SetEvent(args[1], []byte(eventPayload)); err != nil {
+		return shim.Error(err.Error())
+	}
+
+	jsonList, _ := json.Marshal(resultList)
+
+	return shim.Success(jsonList)
+}
+
+func (t *SmartContract) _batchProcess(stub shim.ChaincodeStubInterface, args []string) peer.Response {
+	logger.Infof("batchProcess Args: txCount(%s)", args[0])
+
+	txArrayListCount, _ := strconv.Atoi(args[0])
+	txArgsCount := 0
+	idxArrayList := 0
 	idx := 1
 	i := 0
+
+	type Result struct {
+		Code        int    `json:"code"`
+		Description string `json:"description"`
+	}
+
+	type ResultList struct {
+		Results []*Result `json:"results"`
+	}
+
+	resultList := ResultList{}
 
 	for idxArrayList < txArrayListCount {
 		startIdx := idx + 2
@@ -108,18 +195,151 @@ func (t *SmartContract) batchProcess(stub shim.ChaincodeStubInterface, args []st
 		}
 
 		logger.Infof("args[%d]: %s", id, args[id])
+
+		result := new(Result)
+
 		switch args[id] {
 		case "1":
-			t.registerMember(stub, txArgs)
+			result.Code, result.Description = t._batchRegisterMember(stub, txArgs)
 		case "2":
-			t.transferCoin(stub, txArgs)
+			result.Code, result.Description = t._batchTransferCoin(stub, txArgs)
 		}
+
+		resultList.Results = append(resultList.Results, result)
 
 		idxArrayList++
 
 	}
 
-	return shim.Success(nil)
+	jsonList, _ := json.Marshal(resultList)
+
+	return shim.Success(jsonList)
+}
+
+func (t *SmartContract) batchRegisterMember(stub shim.ChaincodeStubInterface, args []string) string {
+
+	if len(args) != 7 {
+		logger.Error("batchRegisterMember Incorrect arguments. Expecting 7 arguments")
+		return "500"
+	}
+
+	logger.Infof(`batchRegisterMember Args: MemberId(%s), VSCode(%s), CountryCode(%s), 
+	CurrencyCode(%s), MemberRole(%s), Wallet Address(%s), CreatedDate(%s)\n`,
+		args[0], args[1], args[2], args[3], args[4], args[5], args[6])
+
+	memberBytes, err := stub.GetState(args[5])
+	if err != nil {
+		return "500"
+	}
+
+	if memberBytes != nil {
+		return "400"
+	}
+
+	account := new(model.MemberAccount)
+
+	account.MemberId = args[0]
+	account.VSCode = args[1]
+	account.CountryCode = args[2]
+	account.CurrencyCode = args[3]
+	account.MemberRole = args[4]
+	account.CreatedDate = args[6]
+	account.MemberWallet.WalletAddress = args[5]
+	account.MemberWallet.CoinBalance = 10000000000
+	account.MemberWallet.CashBalance = 0
+	account.MemberLevel = "TxLimit:" + "1"
+	account.CustomOneTimeTransferLimit = 0
+	account.CustomOneTimeWithdrawLimit = 0
+	account.CustomOneDayTransferLimit = 0
+	account.CustomOneDayWithdrawLimit = 0
+	account.OneDayTransferSum = 0
+	//account.OneDayTransferDate
+	account.OneDayWithdrawSum = 0
+	//account.OneDayWithdrawDate
+
+	if err := account.Validate(); err != nil {
+		return "500"
+	}
+
+	memberAsBytes, _ := json.Marshal(account)
+
+	//@@ need to define exchange memberRole identifier
+	// if account.MemberRole == "exchange" {
+	// 	uid := fmt.Sprintf("%x", model.GenTxId(memberAsBytes))
+	// 	key, err := stub.CreateCompositeKey("", []string{account.MemberWallet.WalletAddress, uid})
+	// 	if err != nil {
+	// 		return shim.Error(err.Error())
+	// 	}
+
+	// 	err = stub.PutState(key, memberAsBytes)
+	// 	if err != nil {
+	// 		return shim.Error("Failed to set member account")
+	// 	}
+	// } else {
+	if err := stub.PutState(account.MemberWallet.WalletAddress, memberAsBytes); err != nil {
+		return "500"
+	}
+
+	return "201"
+}
+
+func (t *SmartContract) _batchRegisterMember(stub shim.ChaincodeStubInterface, args []string) (int, string) {
+
+	if len(args) != 7 {
+		logger.Error("batchRegisterMember Incorrect arguments. Expecting 7 arguments")
+		return -1, "Incorrect arguments. Expecting 7 arguments"
+	}
+
+	logger.Infof(`batchRegisterMember Args: MemberId(%s), VSCode(%s), CountryCode(%s), 
+	CurrencyCode(%s), MemberRole(%s), Wallet Address(%s), CreatedDate(%s)\n`,
+		args[0], args[1], args[2], args[3], args[4], args[5], args[6])
+
+	account := new(model.MemberAccount)
+
+	account.MemberId = args[0]
+	account.VSCode = args[1]
+	account.CountryCode = args[2]
+	account.CurrencyCode = args[3]
+	account.MemberRole = args[4]
+	account.CreatedDate = args[6]
+	account.MemberWallet.WalletAddress = args[5]
+	account.MemberWallet.CoinBalance = 10000000000
+	account.MemberWallet.CashBalance = 0
+	account.MemberLevel = "TxLimit:" + "1"
+	account.CustomOneTimeTransferLimit = 0
+	account.CustomOneTimeWithdrawLimit = 0
+	account.CustomOneDayTransferLimit = 0
+	account.CustomOneDayWithdrawLimit = 0
+	account.OneDayTransferSum = 0
+	//account.OneDayTransferDate
+	account.OneDayWithdrawSum = 0
+	//account.OneDayWithdrawDate
+
+	if err := account.Validate(); err != nil {
+		return -1, err.Error()
+	}
+
+	memberAsBytes, _ := json.Marshal(account)
+
+	//@@ need to define exchange memberRole identifier
+	// if account.MemberRole == "exchange" {
+	// 	uid := fmt.Sprintf("%x", model.GenTxId(memberAsBytes))
+	// 	key, err := stub.CreateCompositeKey("", []string{account.MemberWallet.WalletAddress, uid})
+	// 	if err != nil {
+	// 		return shim.Error(err.Error())
+	// 	}
+
+	// 	err = stub.PutState(key, memberAsBytes)
+	// 	if err != nil {
+	// 		return shim.Error("Failed to set member account")
+	// 	}
+	// } else {
+	err := stub.PutState(account.MemberWallet.WalletAddress, memberAsBytes)
+	if err != nil {
+		return 0, "Failed to set member account"
+	}
+
+	return 0, "success"
 }
 
 func (t *SmartContract) registerMember(stub shim.ChaincodeStubInterface, args []string) peer.Response {
@@ -132,6 +352,15 @@ func (t *SmartContract) registerMember(stub shim.ChaincodeStubInterface, args []
 	logger.Infof(`registerMember Args: MemberId(%s), VSCode(%s), CountryCode(%s), 
 	CurrencyCode(%s), MemberRole(%s), Wallet Address(%s), CreatedDate(%s)\n`,
 		args[0], args[1], args[2], args[3], args[4], args[5], args[6])
+
+	memberBytes, err := stub.GetState(args[5])
+	if err != nil {
+		return shim.Error(err.Error())
+	}
+
+	if memberBytes != nil {
+		return shim.Error("Already registered")
+	}
 
 	account := new(model.MemberAccount)
 
@@ -173,11 +402,16 @@ func (t *SmartContract) registerMember(stub shim.ChaincodeStubInterface, args []
 	// 		return shim.Error("Failed to set member account")
 	// 	}
 	// } else {
-	err := stub.PutState(account.MemberWallet.WalletAddress, memberAsBytes)
+
+	err = stub.PutState(account.MemberWallet.WalletAddress, memberAsBytes)
 	if err != nil {
 		return shim.Error("Failed to set member account")
 	}
-	//}
+
+	eventPayload := "Test Event"
+	if err := stub.SetEvent(args[0], []byte(eventPayload)); err != nil {
+		return shim.Error(err.Error())
+	}
 
 	return shim.Success(nil)
 }
@@ -367,6 +601,244 @@ func (t *SmartContract) processOrder(stub shim.ChaincodeStubInterface, args []st
 	return shim.Success(nil)
 }
 
+func (t *SmartContract) batchTransferCoin(stub shim.ChaincodeStubInterface, args []string) string {
+
+	if len(args) != 5 {
+		logger.Error("transferCoin Incorrect arguments. Expecting 5 arguments")
+		return "500"
+	}
+
+	logger.Infof("transferCoin Args: senderWalletAddress(%s), receiverWalletAddress(%s), coinAmount(%s), fee(%s), txFlag(%s)\n",
+		args[0], args[1], args[2], args[3], args[4])
+
+	r := new(model.Remittance)
+	r.SenderWalletAddress = args[0]
+	r.ReceiverWalletAddress = args[1]
+	r.Amount, _ = strconv.ParseFloat(args[2], 64)
+	r.Fee, _ = strconv.ParseFloat(args[3], 64)
+	r.TxFlag = args[4]
+
+	if err := r.Validate(); err != nil {
+		return "500"
+	}
+
+	memberAccountBytes, err := t.getMemberAccount(stub, r.SenderWalletAddress)
+
+	if err != nil {
+		return "500"
+	}
+
+	if memberAccountBytes == nil {
+		return "500"
+	}
+
+	senderAccount := new(model.MemberAccount)
+	bytesToStruct(memberAccountBytes, senderAccount)
+
+	if senderAccount.Frozen {
+		return "500"
+	}
+
+	if senderAccount.MemberWallet.CoinBalance < (r.Amount + r.Fee) {
+		return "500"
+	}
+
+	// deprecated
+	// if senderAccount.MemberWallet.CashBalance < r.Fee {
+	// 	return shim.Error("Insufficient Cash Balance")
+	// }
+
+	if senderAccount.MemberRole != "exchange" {
+		if senderAccount.CustomOneTimeTransferLimit != 0 {
+			if senderAccount.CustomOneTimeTransferLimit < r.Amount {
+				return "500"
+			}
+		} else {
+			txLimitBytes, _ := t.getTransactionLimit(stub, senderAccount.MemberLevel)
+			txLimit := new(model.TransactionLimit)
+			bytesToStruct(txLimitBytes, txLimit)
+
+			if txLimit.OneTimeTransferLimit < r.Amount {
+				return "500"
+			}
+		}
+
+		tm := time.Now()
+		txDate := model.TxDate{tm.Year(), tm.Month(), tm.Day()}
+		if txDate != senderAccount.OneDayTransferDate {
+			senderAccount.OneDayTransferDate = txDate
+			senderAccount.OneDayTransferSum = 0
+		}
+
+		if senderAccount.CustomOneDayTransferLimit != 0 {
+			if senderAccount.CustomOneDayTransferLimit < senderAccount.OneDayTransferSum+r.Amount {
+				return "500"
+			}
+		} else {
+			txLimitBytes, _ := t.getTransactionLimit(stub, senderAccount.MemberLevel)
+			txLimit := new(model.TransactionLimit)
+			bytesToStruct(txLimitBytes, txLimit)
+
+			if txLimit.OneDayTransferLimit < senderAccount.OneDayTransferSum+r.Amount {
+				return "500"
+			}
+		}
+	}
+
+	senderAccount.OneDayTransferSum += r.Amount
+
+	memberAccountBytes, _ = json.Marshal(senderAccount)
+
+	err = stub.PutState(senderAccount.MemberWallet.WalletAddress, memberAccountBytes)
+	if err != nil {
+		return "500"
+	}
+
+	memberAccountBytes, err = t.getMemberAccount(stub, r.ReceiverWalletAddress)
+
+	if err != nil {
+		return "500"
+	}
+
+	if memberAccountBytes == nil {
+		return "500"
+	}
+	receiverAccount := new(model.MemberAccount)
+	bytesToStruct(memberAccountBytes, receiverAccount)
+
+	if receiverAccount.Frozen {
+		return "500"
+	}
+
+	t.debitCoin(stub, senderAccount, r.Amount+r.Fee)
+	//t.debitCash(stub, senderAccount, r.Fee) //deprecated
+	t.creditFee(stub, senderAccount.MemberWallet.WalletAddress, r.Fee)
+	t.creditCoin(stub, receiverAccount, r.Amount)
+
+	t.recordTransaction(stub, r, model.TxTransferCoin, model.TxSuccess)
+
+	return "200"
+}
+
+func (t *SmartContract) _batchTransferCoin(stub shim.ChaincodeStubInterface, args []string) (int, string) {
+
+	if len(args) != 5 {
+		logger.Error("transferCoin Incorrect arguments. Expecting 5 arguments")
+		return -1, "Incorrect arguments. Expecting 5 arguments"
+	}
+
+	logger.Infof("transferCoin Args: senderWalletAddress(%s), receiverWalletAddress(%s), coinAmount(%s), fee(%s), txFlag(%s)\n",
+		args[0], args[1], args[2], args[3], args[4])
+
+	r := new(model.Remittance)
+	r.SenderWalletAddress = args[0]
+	r.ReceiverWalletAddress = args[1]
+	r.Amount, _ = strconv.ParseFloat(args[2], 64)
+	r.Fee, _ = strconv.ParseFloat(args[3], 64)
+	r.TxFlag = args[4]
+
+	if err := r.Validate(); err != nil {
+		return -1, err.Error()
+	}
+
+	memberAccountBytes, err := t.getMemberAccount(stub, r.SenderWalletAddress)
+
+	if err != nil {
+		return -1, err.Error()
+	}
+
+	if memberAccountBytes == nil {
+		return -1, "Sender Account not found"
+	}
+
+	senderAccount := new(model.MemberAccount)
+	bytesToStruct(memberAccountBytes, senderAccount)
+
+	if senderAccount.Frozen {
+		return -1, "Cannot execute a transaction into frozen member"
+	}
+
+	if senderAccount.MemberWallet.CoinBalance < (r.Amount + r.Fee) {
+		return -1, "Insufficient Coin Balance"
+	}
+
+	// deprecated
+	// if senderAccount.MemberWallet.CashBalance < r.Fee {
+	// 	return shim.Error("Insufficient Cash Balance")
+	// }
+
+	if senderAccount.MemberRole != "exchange" {
+		if senderAccount.CustomOneTimeTransferLimit != 0 {
+			if senderAccount.CustomOneTimeTransferLimit < r.Amount {
+				return -1, "One Time Transfer Limit Over"
+			}
+		} else {
+			txLimitBytes, _ := t.getTransactionLimit(stub, senderAccount.MemberLevel)
+			txLimit := new(model.TransactionLimit)
+			bytesToStruct(txLimitBytes, txLimit)
+
+			if txLimit.OneTimeTransferLimit < r.Amount {
+				return -1, "One Time Transfer Limit Over"
+			}
+		}
+
+		tm := time.Now()
+		txDate := model.TxDate{tm.Year(), tm.Month(), tm.Day()}
+		if txDate != senderAccount.OneDayTransferDate {
+			senderAccount.OneDayTransferDate = txDate
+			senderAccount.OneDayTransferSum = 0
+		}
+
+		if senderAccount.CustomOneDayTransferLimit != 0 {
+			if senderAccount.CustomOneDayTransferLimit < senderAccount.OneDayTransferSum+r.Amount {
+				return -1, "One Day Transfer Limit Over"
+			}
+		} else {
+			txLimitBytes, _ := t.getTransactionLimit(stub, senderAccount.MemberLevel)
+			txLimit := new(model.TransactionLimit)
+			bytesToStruct(txLimitBytes, txLimit)
+
+			if txLimit.OneDayTransferLimit < senderAccount.OneDayTransferSum+r.Amount {
+				return -1, "One Day Transfer Limit Over"
+			}
+		}
+	}
+
+	senderAccount.OneDayTransferSum += r.Amount
+
+	memberAccountBytes, _ = json.Marshal(senderAccount)
+
+	err = stub.PutState(senderAccount.MemberWallet.WalletAddress, memberAccountBytes)
+	if err != nil {
+		return -1, err.Error()
+	}
+
+	memberAccountBytes, err = t.getMemberAccount(stub, r.ReceiverWalletAddress)
+
+	if err != nil {
+		return -1, err.Error()
+	}
+
+	if memberAccountBytes == nil {
+		return -1, "Receiver Account not found"
+	}
+	receiverAccount := new(model.MemberAccount)
+	bytesToStruct(memberAccountBytes, receiverAccount)
+
+	if receiverAccount.Frozen {
+		return -1, "Cannot execute a transaction into frozen member"
+	}
+
+	t.debitCoin(stub, senderAccount, r.Amount+r.Fee)
+	//t.debitCash(stub, senderAccount, r.Fee) //deprecated
+	t.creditFee(stub, senderAccount.MemberWallet.WalletAddress, r.Fee)
+	t.creditCoin(stub, receiverAccount, r.Amount)
+
+	t.recordTransaction(stub, r, model.TxTransferCoin, model.TxSuccess)
+
+	return 0, "success"
+}
+
 func (t *SmartContract) transferCoin(stub shim.ChaincodeStubInterface, args []string) peer.Response {
 
 	if len(args) != 5 {
@@ -482,6 +954,11 @@ func (t *SmartContract) transferCoin(stub shim.ChaincodeStubInterface, args []st
 	t.creditCoin(stub, receiverAccount, r.Amount)
 
 	t.recordTransaction(stub, r, model.TxTransferCoin, model.TxSuccess)
+
+	eventPayload := "Test Event"
+	if err := stub.SetEvent(args[2], []byte(eventPayload)); err != nil {
+		return shim.Error(err.Error())
+	}
 
 	return shim.Success(nil)
 }

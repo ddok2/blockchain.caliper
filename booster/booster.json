@@ -1,0 +1,25 @@
+{
+  "kafka": {
+    "Version": "1.0.0",
+    "Brokers": "kafka0:9092",
+    "Topics": "booster-topic",
+    "ProducerClientId": "TxBooster_Producer",
+    "ConsumerClientId": "TxBooster_Consumer",
+    "GroupId": "boosterConsumerGroup",
+    "OffsetOldest": true,
+    "Log": true
+  },
+
+  "redis": {
+    "IP": "localhost",
+    "Port": 6379,
+    "Auth": true,
+    "PassWord": "bigsize"
+  },
+
+  "batch": {
+    "Count": 50,
+    "LingerMs": 1000,
+    "MaxBytesPerTx": 128
+  }
+}

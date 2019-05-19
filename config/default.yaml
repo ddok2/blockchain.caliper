@@ -11,11 +11,13 @@ core:
         level: info
       filelogger:
         target: daily-rotate-file
-        level: debug
+        level: info
         filename: log/caliper-%DATE%.log
         datePattern: YYYY-MM-DD-HH
         maxSize: 5m
         zippedArchive: true
+socket-io:
+    port: 4000
 fabricCcp:
     sleepAfter:
         createChannel: 5000

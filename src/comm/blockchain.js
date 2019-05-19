@@ -1,9 +1,9 @@
-/**
-* Copyright 2017 HUAWEI. All Rights Reserved.
-*
-* SPDX-License-Identifier: Apache-2.0
-*
-*/
+/*
+ * Copyright 2019. Nuri Telecom. All Rights Reserved.
+ *
+ * - blockchain.js
+ * - author: Sungyub NA <mailto: syna@nuritelecom.com>
+ */
 
 'use strict';
 
@@ -26,30 +26,35 @@ class Blockchain {
                 this.bcType = 'fabric';
                 this.bcObj = new fabric(configPath);
             }
-            else if(config.caliper.blockchain ==='fabric-ccp') {
-                let Fabric = require('../adapters/fabric-ccp/fabric.js');
-                this.bcType = 'fabric-ccp';
-                this.bcObj = new Fabric(configPath);
-            }
-            else if(config.caliper.blockchain ==='sawtooth') {
-                let sawtooth = require('../adapters/sawtooth/sawtooth.js');
-                this.bcType = 'sawtooth';
-                this.bcObj = new sawtooth(configPath);
-            }
-            else if(config.caliper.blockchain ==='iroha') {
-                let iroha = require('../adapters/iroha/iroha.js');
-                this.bcType = 'iroha';
-                this.bcObj = new iroha(configPath);
-            }
-            else if(config.caliper.blockchain ==='burrow') {
-                let burrow = require('../adapters/burrow/burrow.js');
-                this.bcType = 'burrow';
-                this.bcObj = new burrow(configPath);
-            }
-            else if(config.caliper.blockchain === 'composer') {
-                let composer = require('../adapters/composer/composer.js');
-                this.bcType = 'composer';
-                this.bcObj = new composer(configPath);
+            // else if(config.caliper.blockchain ==='fabric-ccp') {
+            //     let Fabric = require('../adapters/fabric-ccp/fabric.js');
+            //     this.bcType = 'fabric-ccp';
+            //     this.bcObj = new Fabric(configPath);
+            // }
+            // else if(config.caliper.blockchain ==='sawtooth') {
+            //     let sawtooth = require('../adapters/sawtooth/sawtooth.js');
+            //     this.bcType = 'sawtooth';
+            //     this.bcObj = new sawtooth(configPath);
+            // }
+            // else if(config.caliper.blockchain ==='iroha') {
+            //     let iroha = require('../adapters/iroha/iroha.js');
+            //     this.bcType = 'iroha';
+            //     this.bcObj = new iroha(configPath);
+            // }
+            // else if(config.caliper.blockchain ==='burrow') {
+            //     let burrow = require('../adapters/burrow/burrow.js');
+            //     this.bcType = 'burrow';
+            //     this.bcObj = new burrow(configPath);
+            // }
+            // else if(config.caliper.blockchain === 'composer') {
+            //     let composer = require('../adapters/composer/composer.js');
+            //     this.bcType = 'composer';
+            //     this.bcObj = new composer(configPath);
+            // }
+            else if (config.caliper.blockchain === 'booster') {
+                let booster = require('../adapters/fabric-booster/booster');
+                this.bcType = 'booster';
+                this.bcObj = new booster(configPath);
             }
             else {
                 this.bcType = 'unknown';

@@ -128,7 +128,14 @@ function demoRefreshData(updates) {
         + ' Fail:' +  demoData.summary.txFail
         + ' Unfinished:' + (demoData.summary.txSub - demoData.summary.txSucc - demoData.summary.txFail));
    // }
-
+   //  process.send('[Transaction Info] - Submitted: ' + demoData.summary.txSub
+   //      + ' Succ: ' + demoData.summary.txSucc
+   //      + ' Fail:' +  demoData.summary.txFail
+   //      + ' Unfinished:' + (demoData.summary.txSub - demoData.summary.txSucc - demoData.summary.txFail));
+   //  process.send({
+   //      type: 'socket.io',
+   //      data: demoData
+   //  });
     var fs = require('fs');
     fs.writeFileSync(demoFile,  JSON.stringify(demoData));
 }

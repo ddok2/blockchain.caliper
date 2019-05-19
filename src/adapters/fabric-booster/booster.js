@@ -1,9 +1,8 @@
-/**
- *  Copyright 2019 NURI Telecom. All Rights Reserved.
+/*******************************************************************************
+ * Copyright (c) 2019. Nuri Telecom. All Rights Reserved.
  *
- *  Sungyub NA <mailto: syna@nuritelecom.com>
- *
- */
+ * Sungyub NA <mailto: syna@nuritelecom.com>
+ ******************************************************************************/
 
 'use strict';
 
@@ -15,7 +14,7 @@ const impl_install = require('./install-chaincode.js');
 const impl_instantiate = require('./instantiate-chaincode.js');
 const BlockchainInterface = require('../../comm/blockchain-interface.js');
 const commUtils = require('../../comm/util');
-const commLogger = commUtils.getLogger('fabric.js');
+const commLogger = commUtils.getLogger('booster.js');
 const TxStatus = require('../../comm/transaction');
 
 /**
@@ -38,10 +37,10 @@ class Booster extends BlockchainInterface {
         util.init(this.configPath);
         e2eUtils.init(this.configPath);
         try {
-            await impl_create.run(this.configPath);
-            await impl_join.run(this.configPath);
+            // await impl_create.run(this.configPath);
+            // await impl_join.run(this.configPath);
         } catch (err) {
-            commLogger.error(`Fabric initialization failed: ${(err.stack
+            commLogger.error(`NURI Fabric initialization failed: ${(err.stack
                 ? err.stack
                 : err)}`);
             throw err;
@@ -57,7 +56,7 @@ class Booster extends BlockchainInterface {
             await impl_install.run(this.configPath);
             await impl_instantiate.run(this.configPath);
         } catch (err) {
-            commLogger.error(`Fabric chaincode install failed: ${(err.stack
+            commLogger.error(`NURI Fabric chaincode install failed: ${(err.stack
                 ? err.stack
                 : err)}`);
             throw err;

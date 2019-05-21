@@ -1,10 +1,9 @@
-/**
-* Copyright 2017 HUAWEI. All Rights Reserved.
-*
-* SPDX-License-Identifier: Apache-2.0
-*
-* @file Implementation of the default test framework which start a test flow to run multiple tests according to the configuration file
-*/
+/*
+ * Copyright 2019. Nuri Telecom. All Rights Reserved.
+ *
+ * - bench-flow.js
+ * - author: Sungyub NA <mailto: syna@nuritelecom.com>
+ */
 
 
 'use strict';
@@ -19,7 +18,7 @@ const Monitor = require('./monitor/monitor.js');
 const Report  = require('./report.js');
 const Client  = require('./client/client.js');
 const Util = require('./util.js');
-const logger = Util.getLogger('bench-flow.js');
+// const logger = Util.getLogger('bench-flow.js');
 const config = require('./config-util.js');
 let blockchain, monitor, report, client;
 let success = 0, failure = 0;
@@ -29,6 +28,36 @@ let demo = require('../gui/src/demo.js');
 let absConfigFile, absNetworkFile;
 let absCaliperDir = path.join(__dirname, '..', '..');
 
+
+const logger = {
+    debug: (msg) => {
+        process.send({
+            type: 'socket.io',
+            data: {
+                message: msg
+            }
+        });
+        return Util.getLogger('bench-flow.js').debug(msg);
+    },
+    info: (msg) => {
+        process.send({
+            type: 'socket.io',
+            data: {
+                message: msg
+            }
+        });
+        return Util.getLogger('bench-flow.js').info(msg);
+    },
+    error: (msg) => {
+        process.send({
+            type: 'socket.io',
+            data: {
+                message: msg
+            }
+        });
+        return Util.getLogger('bench-flow.js').error(msg);
+    }
+};
 
 /**
  * Generate mustache template for test report
@@ -83,6 +112,12 @@ function createReport() {
 function printTable(value) {
     let t = table.table(value, {border: table.getBorderCharacters('ramac')});
     logger.info('\n' + t);
+    // process.send({
+    //     type: 'socket.io',
+    //     data: {
+    //         message: t
+    //     }
+    // });
 }
 
 /**
@@ -268,6 +303,12 @@ async function defaultTest(args, clientArgs, final) {
 
     for (let test of tests) {
         logger.info(`------ Test round ${round + 1} ------`);
+        // process.send({
+        //     type: 'socket.io',
+        //     data: {
+        //         message: `------ Test round ${round + 1} ------`
+        //     }
+        // });
         round++;
         testIdx++;
 
@@ -279,10 +320,22 @@ async function defaultTest(args, clientArgs, final) {
             demo.pauseWatch();
             success++;
             logger.info(`------ Passed '${testLabel}' testing ------`);
+            // process.send({
+            //     type: 'socket.io',
+            //     data: {
+            //         message: `------ Passed '${testLabel}' testing ------`
+            //     }
+            // });
 
             // prepare for the next round
             if(!final || testIdx !== tests.length) {
                 logger.info('Waiting 5 seconds for the next round...');
+                // process.send({
+                //     type: 'socket.io',
+                //     data: {
+                //         message: 'Waiting 5 seconds for the next round...'
+                //     }
+                // });
                 await Util.sleep(5000);
                 await monitor.restart();
             }
@@ -324,6 +377,12 @@ function execAsync(command) {
  */
 module.exports.run = async function(configFile, networkFile) {
     logger.info('####### Caliper Test #######');
+    // process.send({
+    //     type: 'socket.io',
+    //     data: {
+    //         message: '####### Caliper Test #######'
+    //     }
+    // });
     absConfigFile  = Util.resolvePath(configFile);
     absNetworkFile = Util.resolvePath(networkFile);
     blockchain = new Blockchain(absNetworkFile);
@@ -373,6 +432,12 @@ module.exports.run = async function(configFile, networkFile) {
         }
 
         logger.info('---------- Finished Test ----------\n');
+        // process.send({
+        //     type: 'socket.io',
+        //     data: {
+        //         message: '---------- Finished Test ----------'
+        //     }
+        // });
         printResultsByRound();
         monitor.printMaxStats();
         await monitor.stop();
@@ -407,5 +472,11 @@ ${'#'.repeat(testSummary.length)}
 ${testSummary}
 ${'#'.repeat(testSummary.length)}
 `);
+        // process.send({
+        //     type: 'socket.io',
+        //     data: {
+        //         message: `# Test summary: ${success} succeeded, ${failure} failed #`
+        //     }
+        // });
     }
 };

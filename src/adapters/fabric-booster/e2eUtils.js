@@ -8,7 +8,7 @@
 'use strict';
 
 const commUtils = require('../../comm/util');
-const commLogger = commUtils.getLogger('e2eUtils.js');
+// const commLogger = commUtils.getLogger('e2eUtils.js');
 const TxStatus = require('../../comm/transaction');
 
 const FabricCAServices = require('fabric-ca-client');
@@ -19,6 +19,45 @@ const testUtil = require('./util.js');
 
 const client = require('http');
 const qs = require('qs');
+
+const commLogger = {
+  debug: (msg) => {
+    process.send({
+      type: 'socket.io',
+      data: {
+        message: msg
+      }
+    });
+    return commUtils.getLogger('e2eUtils.js').debug(msg);
+  },
+  info: (msg) => {
+    process.send({
+      type: 'socket.io',
+      data: {
+        message: msg
+      }
+    });
+    return commUtils.getLogger('e2eUtils.js').info(msg);
+  },
+  warn: (msg) => {
+    process.send({
+      type: 'socket.io',
+      data: {
+        message: msg
+      }
+    });
+    return commUtils.getLogger('e2eUtils.js').warn(msg);
+  },
+  error: (msg) => {
+    process.send({
+      type: 'socket.io',
+      data: {
+        message: msg
+      }
+    });
+    return commUtils.getLogger('e2eUtils.js').error(msg);
+  }
+};
 
 // const signedOffline = require('./signTransactionOffline.js');
 
@@ -32,7 +71,7 @@ let boosterConfig = null;
 let signedTransactionArray = [];
 let signedCommitProposal = [];
 let txFile;
-// let invokeCount = 0;
+let invokeCount = 0;
 let clientIndex = 0;
 
 /**

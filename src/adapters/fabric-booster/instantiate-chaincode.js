@@ -1,23 +1,54 @@
-/**
-* Licensed under the Apache License, Version 2.0 (the "License");
-* you may not use this file except in compliance with the License.
-* You may obtain a copy of the License at
-*
-* http://www.apache.org/licenses/LICENSE-2.0
-*
-* Unless required by applicable law or agreed to in writing, software
-* distributed under the License is distributed on an "AS IS" BASIS,
-* WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-* See the License for the specific language governing permissions and
-* limitations under the License.
-*
-*/
+/*
+ * Copyright 2019. Nuri Telecom. All Rights Reserved.
+ *
+ * - instantiate-chaincode.js
+ * - author: Sungyub NA <mailto: syna@nuritelecom.com>
+ */
 
 'use strict';
 
 const e2eUtils = require('./e2eUtils.js');
 const commUtils = require('../../comm/util');
-const commLogger = commUtils.getLogger('instantiate-chaincode.js');
+// const commLogger = commUtils.getLogger('instantiate-chaincode.js');
+
+const commLogger = {
+    debug: (msg) => {
+        process.send({
+            type: 'socket.io',
+            data: {
+                message: msg
+            }
+        });
+        return commUtils.getLogger('instantiate-chaincode.js').debug(msg);
+    },
+    info: (msg) => {
+        process.send({
+            type: 'socket.io',
+            data: {
+                message: msg
+            }
+        });
+        return commUtils.getLogger('instantiate-chaincode.js').info(msg);
+    },
+    warn: (msg) => {
+        process.send({
+            type: 'socket.io',
+            data: {
+                message: msg
+            }
+        });
+        return commUtils.getLogger('instantiate-chaincode.js').warn(msg);
+    },
+    error: (msg) => {
+        process.send({
+            type: 'socket.io',
+            data: {
+                message: msg
+            }
+        });
+        return commUtils.getLogger('instantiate-chaincode.js').error(msg);
+    }
+};
 
 /**
  * Install the chaincode listed within config

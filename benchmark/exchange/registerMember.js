@@ -16,14 +16,14 @@ let account_array = [],
     contx;
 
 const init = function(blockchain, context, args) {
-    if (!args.hasOwnProperty('txnPerBatch')) {
-        args.txnPerBatch = 1;
-    }
-    txnPerBatch = args.txnPerBatch;
-    bc = blockchain;
-    contx = context;
+  if (!args.hasOwnProperty('txnPerBatch')) {
+    args.txnPerBatch = 1;
+  }
+  txnPerBatch = args.txnPerBatch;
+  bc = blockchain;
+  contx = context;
 
-    return Promise.resolve();
+  return Promise.resolve();
 };
 
 /**
@@ -31,38 +31,42 @@ const init = function(blockchain, context, args) {
  * @returns {Array} workload
  */
 function generateWorkload() {
-    let workload = [];
-    for (let i = 0; i < txnPerBatch; i++) {
-        const userId = randomBytes(20).toString('hex');
-        account_array.push(userId);
+  let workload = [];
+  for (let i = 0; i < txnPerBatch; i++) {
+    const userId = randomBytes(20).toString('hex');
+    account_array.push(userId);
 
-        workload.push({
-            func: 'registerMember',
-            memberId: userId,
-            vsCode: 'v1',
-            countryCode: 'ghana',
-            currencyCode: 'cedi',
-            memberRole: 'test',
-            walletAddress: userId,
-            createdDate: moment().format('YY-MM-DD HH:mm:ss'),
-        });
-    }
-    return workload;
+    workload.push({
+      func: 'registerMember',
+      memberId: userId,
+      vsCode: 'v1',
+      countryCode: 'ghana',
+      currencyCode: 'cedi',
+      memberRole: 'test',
+      walletAddress: userId,
+      createdDate: moment().format('YY-MM-DD HH:mm:ss'),
+    });
+  }
+  return workload;
 }
 
+/**
+ * Start Test (exchange)
+ * @returns {Promise<Object>}
+ * invokeSmartContract(contx, chaincodeid, version, args, timeout)
+ */
 const run = function() {
-    let args = generateWorkload();
-    return bc.invokeSmartContract(contx, 'exchange', '1.0', args, 50000);
+  let args = generateWorkload();
+  return bc.invokeSmartContract(contx, 'exchange', '1.0', args, 50000);
 };
 
 const end = function() {
-    return Promise.resolve();
+  return Promise.resolve();
 };
 
 module.exports = {
-    info,
-    init,
-    run,
-    end,
+  info,
+  init,
+  run,
+  end,
 };
-

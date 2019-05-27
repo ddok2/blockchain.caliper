@@ -5,7 +5,6 @@
  * - author: Sungyub NA <mailto: syna@nuritelecom.com>
  */
 
-
 'use strict';
 
 // global variables
@@ -15,8 +14,8 @@ const path = require('path');
 const table = require('table');
 const Blockchain = require('./blockchain.js');
 const Monitor = require('./monitor/monitor.js');
-const Report  = require('./report.js');
-const Client  = require('./client/client.js');
+const Report = require('./report.js');
+const Client = require('./client/client.js');
 const Util = require('./util.js');
 // const logger = Util.getLogger('bench-flow.js');
 const config = require('./config-util.js');
@@ -28,81 +27,77 @@ let demo = require('../gui/src/demo.js');
 let absConfigFile, absNetworkFile;
 let absCaliperDir = path.join(__dirname, '..', '..');
 
-
 const logger = {
-    debug: (msg) => {
-        process.send({
-            type: 'socket.io',
-            data: {
-                message: msg
-            }
-        });
-        return Util.getLogger('bench-flow.js').debug(msg);
-    },
-    info: (msg) => {
-        process.send({
-            type: 'socket.io',
-            data: {
-                message: msg
-            }
-        });
-        return Util.getLogger('bench-flow.js').info(msg);
-    },
-    error: (msg) => {
-        process.send({
-            type: 'socket.io',
-            data: {
-                message: msg
-            }
-        });
-        return Util.getLogger('bench-flow.js').error(msg);
-    }
+  debug: (msg) => {
+    process.send({
+      type: 'socket.io',
+      data: {
+        message: msg,
+      },
+    });
+    return Util.getLogger('bench-flow.js').debug(msg);
+  },
+  info: (msg) => {
+    process.send({
+      type: 'socket.io',
+      data: {
+        message: msg,
+      },
+    });
+    return Util.getLogger('bench-flow.js').info(msg);
+  },
+  error: (msg) => {
+    process.send({
+      type: 'socket.io',
+      data: {
+        message: msg,
+      },
+    });
+    return Util.getLogger('bench-flow.js').error(msg);
+  },
 };
 
 /**
  * Generate mustache template for test report
  */
 function createReport() {
-    let config = Util.parseYaml(absConfigFile);
-    report  = new Report();
-    report.addMetadata('DLT', blockchain.gettype());
-    try{
-        report.addMetadata('Benchmark', config.test.name);
+  let config = Util.parseYaml(absConfigFile);
+  report = new Report();
+  report.addMetadata('DLT', blockchain.gettype());
+  try {
+    report.addMetadata('Benchmark', config.test.name);
+  } catch (err) {
+    report.addMetadata('Benchmark', ' ');
+  }
+  try {
+    report.addMetadata('Description', config.test.description);
+  } catch (err) {
+    report.addMetadata('Description', ' ');
+  }
+  try {
+    let r = 0;
+    for (let i = 0; i < config.test.rounds.length; i++) {
+      if (config.test.rounds[i].hasOwnProperty('txNumber')) {
+        r += config.test.rounds[i].txNumber.length;
+      } else if (config.test.rounds[i].hasOwnProperty('txDuration')) {
+        r += config.test.rounds[i].txDuration.length;
+      }
     }
-    catch(err) {
-        report.addMetadata('Benchmark', ' ');
-    }
-    try{
-        report.addMetadata('Description', config.test.description);
-    }
-    catch(err) {
-        report.addMetadata('Description', ' ');
-    }
-    try{
-        let r = 0;
-        for(let i = 0 ; i < config.test.rounds.length ; i++) {
-            if(config.test.rounds[i].hasOwnProperty('txNumber')) {
-                r += config.test.rounds[i].txNumber.length;
-            } else if (config.test.rounds[i].hasOwnProperty('txDuration')) {
-                r += config.test.rounds[i].txDuration.length;
-            }
-        }
-        report.addMetadata('Test Rounds', r);
+    report.addMetadata('Test Rounds', r);
 
-        report.setBenchmarkInfo(JSON.stringify(config.test, null, 2));
-    }
-    catch(err) {
-        report.addMetadata('Test Rounds', ' ');
-    }
+    report.setBenchmarkInfo(JSON.stringify(config.test, null, 2));
+  } catch (err) {
+    report.addMetadata('Test Rounds', ' ');
+  }
 
-    let sut = Util.parseYaml(absNetworkFile);
-    if(sut.hasOwnProperty('info')) {
-        for(let key in sut.info) {
-            report.addSUTInfo(key, sut.info[key]);
-        }
+  let sut = Util.parseYaml(absNetworkFile);
+  if (sut.hasOwnProperty('info')) {
+    for (let key in sut.info) {
+      report.addSUTInfo(key, sut.info[key]);
     }
+  }
 
-    report.addLabelDescriptionMap(config.test.rounds);
+  report.addLabelDescriptionMap(config.test.rounds);
 }
 
 /**
@@ -110,14 +105,14 @@ function createReport() {
  * @param {Array} value rows of the table
  */
 function printTable(value) {
-    let t = table.table(value, {border: table.getBorderCharacters('ramac')});
-    logger.info('\n' + t);
-    // process.send({
-    //     type: 'socket.io',
-    //     data: {
-    //         message: t
-    //     }
-    // });
+  let t = table.table(value, { border: table.getBorderCharacters('ramac') });
+  logger.info('\n' + t);
+  // process.send({
+  //     type: 'socket.io',
+  //     data: {
+  //         message: t
+  //     }
+  // });
 }
 
 /**
@@ -125,8 +120,16 @@ function printTable(value) {
  * @return {Array} row of the title
  */
 function getResultTitle() {
-    // temporarily remove percentile return ['Name', 'Succ', 'Fail', 'Send Rate', 'Max Latency', 'Min Latency', 'Avg Latency', '75%ile Latency', 'Throughput'];
-    return ['Name', 'Succ', 'Fail', 'Send Rate', 'Max Latency', 'Min Latency', 'Avg Latency', 'Throughput'];
+  // temporarily remove percentile return ['Name', 'Succ', 'Fail', 'Send Rate', 'Max Latency', 'Min Latency', 'Avg Latency', '75%ile Latency', 'Throughput'];
+  return [
+    'Name',
+    'Succ',
+    'Fail',
+    'Send Rate',
+    'Max Latency',
+    'Min Latency',
+    'Avg Latency',
+    'Throughput'];
 }
 
 /**
@@ -136,49 +139,55 @@ function getResultTitle() {
  */
 function getResultValue(r) {
 
-    let row = [];
-    try {
-        row.push(r.label);
-        row.push(r.succ);
-        row.push(r.fail);
-        (r.create.max === r.create.min) ? row.push((r.succ + r.fail) + ' tps') : row.push(((r.succ + r.fail) / (r.create.max - r.create.min)).toFixed(1) + ' tps');
-        row.push(r.delay.max.toFixed(2) + ' s');
-        row.push(r.delay.min.toFixed(2) + ' s');
-        row.push((r.delay.sum / r.succ).toFixed(2) + ' s');
-        // temporarily remove percentile
-        /*if(r.delay.detail.length === 0) {
-            row.push('N/A');
-        }
-        else{
-            r.delay.detail.sort(function(a, b) {
-                return a-b;
-            });
-            row.push(r.delay.detail[Math.floor(r.delay.detail.length * 0.75)].toFixed(2) + ' s');
-        }*/
-
-        (r.final.max === r.create.min) ? row.push(r.succ + ' tps') : row.push(((r.succ / (r.final.max - r.create.min)).toFixed(1)) + ' tps');
-        logger.debug('r.create.max: '+ r.create.max + ' r.create.min: ' + r.create.min + ' r.final.max: ' + r.final.max + ' r.final.min: '+ r.final.min);
+  let row = [];
+  try {
+    row.push(r.label);
+    row.push(r.succ);
+    row.push(r.fail);
+    (r.create.max === r.create.min)
+        ? row.push((r.succ + r.fail) + ' tps')
+        : row.push(
+        ((r.succ + r.fail) / (r.create.max - r.create.min)).toFixed(1) +
+        ' tps');
+    row.push(r.delay.max.toFixed(2) + ' s');
+    row.push(r.delay.min.toFixed(2) + ' s');
+    row.push((r.delay.sum / r.succ).toFixed(2) + ' s');
+    // temporarily remove percentile
+    /*if(r.delay.detail.length === 0) {
+        row.push('N/A');
     }
-    catch (err) {
-        // temporarily remove percentile row = [r.label, 0, 0, 'N/A', 'N/A', 'N/A', 'N/A', 'N/A', 'N/A'];
-        row = [r.label, 0, 0, 'N/A', 'N/A', 'N/A', 'N/A', 'N/A'];
-    }
+    else{
+        r.delay.detail.sort(function(a, b) {
+            return a-b;
+        });
+        row.push(r.delay.detail[Math.floor(r.delay.detail.length * 0.75)].toFixed(2) + ' s');
+    }*/
 
-    return row;
+    (r.final.max === r.create.min) ? row.push(r.succ + ' tps') : row.push(
+        ((r.succ / (r.final.max - r.create.min)).toFixed(1)) + ' tps');
+    logger.debug(
+        'r.create.max: ' + r.create.max + ' r.create.min: ' + r.create.min +
+        ' r.final.max: ' + r.final.max + ' r.final.min: ' + r.final.min);
+  } catch (err) {
+    // temporarily remove percentile row = [r.label, 0, 0, 'N/A', 'N/A', 'N/A', 'N/A', 'N/A', 'N/A'];
+    row = [r.label, 0, 0, 'N/A', 'N/A', 'N/A', 'N/A', 'N/A'];
+  }
+
+  return row;
 }
 
 /**
  * print the performance testing results of all test rounds
  */
 function printResultsByRound() {
-    resultsbyround[0].unshift('Test');
-    for(let i = 1 ; i < resultsbyround.length ; i++) {
-        resultsbyround[i].unshift(i.toFixed(0));
-    }
-    logger.info('###all test results:###');
-    printTable(resultsbyround);
+  resultsbyround[0].unshift('Test');
+  for (let i = 1; i < resultsbyround.length; i++) {
+    resultsbyround[i].unshift(i.toFixed(0));
+  }
+  logger.info('###all test results:###');
+  printTable(resultsbyround);
 
-    report.setSummaryTable(resultsbyround);
+  report.setSummaryTable(resultsbyround);
 }
 
 /**
@@ -194,48 +203,46 @@ function printResultsByRound() {
  * @param {String} label label of the test round
  * @return {Promise} promise object
  */
-function processResult(results, label){
-    try{
-        let resultTable = [];
-        resultTable[0] = getResultTitle();
-        let r;
-        if(Blockchain.mergeDefaultTxStats(results) === 0) {
-            r = Blockchain.createNullDefaultTxStats();
-            r.label = label;
-        }
-        else {
-            r = results[0];
-            r.label = label;
-            resultTable[1] = getResultValue(r);
-        }
+function processResult(results, label) {
+  try {
+    let resultTable = [];
+    resultTable[0] = getResultTitle();
+    let r;
+    if (Blockchain.mergeDefaultTxStats(results) === 0) {
+      r = Blockchain.createNullDefaultTxStats();
+      r.label = label;
+    } else {
+      r = results[0];
+      r.label = label;
+      resultTable[1] = getResultValue(r);
+    }
 
-        let sTP = r.sTPTotal / r.length;
-        let sT = r.sTTotal / r.length;
-        logger.debug('sendTransactionProposal: ' + sTP + 'ms length: ' + r.length);
-        logger.debug('sendTransaction: ' + sT + 'ms');
-        logger.debug('invokeLantency: ' + r.invokeTotal / r.length + 'ms');
-        if(resultsbyround.length === 0) {
-            resultsbyround.push(resultTable[0].slice(0));
-        }
-        if(resultTable.length > 1) {
-            resultsbyround.push(resultTable[1].slice(0));
-        }
-        logger.info('###test result:###');
-        printTable(resultTable);
-        let idx = report.addBenchmarkRound(label);
-        report.setRoundPerformance(label, idx, resultTable);
-        let resourceTable = monitor.getDefaultStats();
-        if(resourceTable.length > 0) {
-            logger.info('### resource stats ###');
-            printTable(resourceTable);
-            report.setRoundResource(label, idx, resourceTable);
-        }
-        return Promise.resolve();
+    let sTP = r.sTPTotal / r.length;
+    let sT = r.sTTotal / r.length;
+    logger.debug('sendTransactionProposal: ' + sTP + 'ms length: ' + r.length);
+    logger.debug('sendTransaction: ' + sT + 'ms');
+    logger.debug('invokeLantency: ' + r.invokeTotal / r.length + 'ms');
+    if (resultsbyround.length === 0) {
+      resultsbyround.push(resultTable[0].slice(0));
     }
-    catch(err) {
-        logger.error(err);
-        return Promise.reject(err);
+    if (resultTable.length > 1) {
+      resultsbyround.push(resultTable[1].slice(0));
     }
+    logger.info('###test result:###');
+    printTable(resultTable);
+    let idx = report.addBenchmarkRound(label);
+    report.setRoundPerformance(label, idx, resultTable);
+    let resourceTable = monitor.getDefaultStats();
+    if (resourceTable.length > 0) {
+      logger.info('### resource stats ###');
+      printTable(resourceTable);
+      report.setRoundResource(label, idx, resourceTable);
+    }
+    return Promise.resolve();
+  } catch (err) {
+    logger.error(err);
+    return Promise.reject(err);
+  }
 }
 
 /**
@@ -246,107 +253,115 @@ function processResult(results, label){
  * @async
  */
 async function defaultTest(args, clientArgs, final) {
-    logger.info(`####### Testing '${args.label}' #######`);
-    let testLabel   = args.label;
-    let testRounds  = args.txDuration ? args.txDuration : args.txNumber;
-    let tests = []; // array of all test rounds
-    let configPath = path.relative(absCaliperDir, absNetworkFile);
+  logger.info(`####### Testing '${args.label}' #######`);
+  let testLabel = args.label;
+  let testRounds = args.txDuration ? args.txDuration : args.txNumber;
+  let tests = []; // array of all test rounds
+  let configPath = path.relative(absCaliperDir, absNetworkFile);
 
-    for(let i = 0 ; i < testRounds.length ; i++) {
-        let msg = {
-            type: 'test',
-            label : args.label,
-            rateControl: args.rateControl[i] ? args.rateControl[i] : {type:'fixed-rate', 'opts' : {'tps': 1}},
-            trim: args.trim ? args.trim : 0,
-            args: args.arguments,
-            cb  : args.callback,
-            config: configPath
-        };
-        // condition for time based or number based test driving
-        if (args.txNumber) {
-            msg.numb = testRounds[i];
-            // File information for reading or writing transaction request
-            msg.txFile = {roundLength: testRounds.length, roundCurrent: i, txMode: args.txMode};
-            if(args.txMode && args.txMode.type === 'file-write') {
-                logger.info('------ Prepare(file-write) waiting ------');
-                msg.txFile.readWrite = 'write';
-                msg.rateControl = {type: 'fixed-rate', opts: {tps: 400}};
-                try {
-                    await client.startTest(msg, clientArgs, function(){}, testLabel);
-                    msg.numb = testRounds[i];
-                    msg.txFile.readWrite = 'read';
-                    msg.rateControl = args.rateControl[i] ? args.rateControl[i] : {type:'fixed-rate', 'opts' : {'tps': 1}};
-                    if(i === (testRounds.length - 1)) {
-                        logger.info('Waiting 5 seconds...');
-                        logger.info('------ Prepare(file-write) success------');
-                        await Util.sleep(5000);
-                    }
-                } catch (err) {
-                    logger.error('------Prepare(file-write) failed------');
-                    args.txMode.type = 'file-no';
-                }
-
-            }else if(args.txMode && args.txMode.type === 'file-read'){
-                msg.txFile.readWrite = 'read';
-            }else {
-                msg.txFile.readWrite = 'no';
-            }
-        } else if (args.txDuration) {
-            msg.txDuration = testRounds[i];
-        } else {
-            throw new Error('Unspecified test driving mode');
+  for (let i = 0; i < testRounds.length; i++) {
+    let msg = {
+      type: 'test',
+      label: args.label,
+      rateControl: args.rateControl[i]
+          ? args.rateControl[i]
+          : { type: 'fixed-rate', 'opts': { 'tps': 1 } },
+      trim: args.trim ? args.trim : 0,
+      args: args.arguments,
+      cb: args.callback,
+      config: configPath,
+    };
+    // condition for time based or number based test driving
+    if (args.txNumber) {
+      msg.numb = testRounds[i];
+      // File information for reading or writing transaction request
+      msg.txFile = {
+        roundLength: testRounds.length,
+        roundCurrent: i,
+        txMode: args.txMode,
+      };
+      if (args.txMode && args.txMode.type === 'file-write') {
+        logger.info('------ Prepare(file-write) waiting ------');
+        msg.txFile.readWrite = 'write';
+        msg.rateControl = { type: 'fixed-rate', opts: { tps: 400 } };
+        try {
+          await client.startTest(msg, clientArgs, function() {}, testLabel);
+          msg.numb = testRounds[i];
+          msg.txFile.readWrite = 'read';
+          msg.rateControl = args.rateControl[i]
+              ? args.rateControl[i]
+              : { type: 'fixed-rate', 'opts': { 'tps': 1 } };
+          if (i === (testRounds.length - 1)) {
+            logger.info('Waiting 5 seconds...');
+            logger.info('------ Prepare(file-write) success------');
+            await Util.sleep(5000);
+          }
+        } catch (err) {
+          logger.error('------Prepare(file-write) failed------');
+          args.txMode.type = 'file-no';
         }
-        tests.push(msg);
+
+      } else if (args.txMode && args.txMode.type === 'file-read') {
+        msg.txFile.readWrite = 'read';
+      } else {
+        msg.txFile.readWrite = 'no';
+      }
+    } else if (args.txDuration) {
+      msg.txDuration = testRounds[i];
+    } else {
+      throw new Error('Unspecified test driving mode');
     }
+    tests.push(msg);
+  }
 
-    let testIdx = 0;
+  let testIdx = 0;
 
-    for (let test of tests) {
-        logger.info(`------ Test round ${round + 1} ------`);
+  for (let test of tests) {
+    logger.info(`------ Test round ${round + 1} ------`);
+    // process.send({
+    //     type: 'socket.io',
+    //     data: {
+    //         message: `------ Test round ${round + 1} ------`
+    //     }
+    // });
+    round++;
+    testIdx++;
+
+    test.roundIdx = round; // propagate round ID to clients
+    demo.startWatch(client);
+    try {
+      await client.startTest(test, clientArgs, processResult, testLabel);
+
+      demo.pauseWatch();
+      success++;
+      logger.info(`------ Passed '${testLabel}' testing ------`);
+      // process.send({
+      //     type: 'socket.io',
+      //     data: {
+      //         message: `------ Passed '${testLabel}' testing ------`
+      //     }
+      // });
+
+      // prepare for the next round
+      if (!final || testIdx !== tests.length) {
+        logger.info('Waiting 5 seconds for the next round...');
         // process.send({
         //     type: 'socket.io',
         //     data: {
-        //         message: `------ Test round ${round + 1} ------`
+        //         message: 'Waiting 5 seconds for the next round...'
         //     }
         // });
-        round++;
-        testIdx++;
-
-        test.roundIdx = round; // propagate round ID to clients
-        demo.startWatch(client);
-        try {
-            await client.startTest(test, clientArgs, processResult, testLabel);
-
-            demo.pauseWatch();
-            success++;
-            logger.info(`------ Passed '${testLabel}' testing ------`);
-            // process.send({
-            //     type: 'socket.io',
-            //     data: {
-            //         message: `------ Passed '${testLabel}' testing ------`
-            //     }
-            // });
-
-            // prepare for the next round
-            if(!final || testIdx !== tests.length) {
-                logger.info('Waiting 5 seconds for the next round...');
-                // process.send({
-                //     type: 'socket.io',
-                //     data: {
-                //         message: 'Waiting 5 seconds for the next round...'
-                //     }
-                // });
-                await Util.sleep(5000);
-                await monitor.restart();
-            }
-        } catch (err) {
-            demo.pauseWatch();
-            failure++;
-            logger.error(`------ Failed '${testLabel}' testing with the following error ------
+        await Util.sleep(5000);
+        await monitor.restart();
+      }
+    } catch (err) {
+      demo.pauseWatch();
+      failure++;
+      logger.error(`------ Failed '${testLabel}' testing with the following error ------
 ${err.stack ? err.stack : err}`);
-            // continue with next round
-        }
+      // continue with next round
     }
+  }
 }
 
 /**
@@ -356,18 +371,19 @@ ${err.stack ? err.stack : err}`);
  * @async
  */
 function execAsync(command) {
-    return new Promise((resolve, reject) => {
-        logger.info(`Executing command: ${command}`);
-        let child = exec(command, {cwd: absCaliperDir}, (err, stdout, stderr) => {
-            if (err) {
-                logger.error(`Unsuccessful command execution. Error code: ${err.code}. Terminating signal: ${err.signal}`);
-                return reject(err);
-            }
-            return resolve();
-        });
-        child.stdout.pipe(process.stdout);
-        child.stderr.pipe(process.stderr);
+  return new Promise((resolve, reject) => {
+    logger.info(`Executing command: ${command}`);
+    let child = exec(command, { cwd: absCaliperDir }, (err, stdout, stderr) => {
+      if (err) {
+        logger.error(
+            `Unsuccessful command execution. Error code: ${err.code}. Terminating signal: ${err.signal}`);
+        return reject(err);
+      }
+      return resolve();
     });
+    child.stdout.pipe(process.stdout);
+    child.stderr.pipe(process.stderr);
+  });
 }
 
 /**
@@ -376,110 +392,115 @@ function execAsync(command) {
  * @param {String} networkFile path of the blockchain configuration file
  */
 module.exports.run = async function(configFile, networkFile) {
-    logger.info('####### Caliper Test #######');
+  logger.info('####### Caliper Test #######');
+  // process.send({
+  //     type: 'socket.io',
+  //     data: {
+  //         message: '####### Caliper Test #######'
+  //     }
+  // });
+  absConfigFile = Util.resolvePath(configFile);
+  absNetworkFile = Util.resolvePath(networkFile);
+  blockchain = new Blockchain(absNetworkFile);
+  monitor = new Monitor(absConfigFile);
+  client = new Client(absConfigFile);
+  createReport();
+  demo.init();
+
+  //let configObject = require(absConfigFile);
+  let configObject = Util.parseYaml(absConfigFile);
+  let networkObject = Util.parseYaml(absNetworkFile);
+
+  let skipStart = config.getConfigSetting('core:skipStartScript', false);
+  let skipEnd = config.getConfigSetting('core:skipEndScript', false);
+  skipStart = skipStart === true || skipStart === 'true';
+  skipEnd = skipEnd === true || skipEnd === 'true';
+
+  try {
+    if (networkObject.hasOwnProperty('caliper') &&
+        networkObject.caliper.hasOwnProperty('command') &&
+        networkObject.caliper.command.hasOwnProperty('start')) {
+      if (!networkObject.caliper.command.start.trim()) {
+        throw new Error('Start command is specified but it is empty');
+      }
+      if (!skipStart) {
+        await execAsync(networkObject.caliper.command.start);
+      }
+    }
+
+    await blockchain.init();
+    await blockchain.installSmartContract();
+    let numberOfClients = await client.init();
+    let clientArgs = await blockchain.prepareClients(numberOfClients);
+
+    try {
+      await monitor.start();
+      logger.info('Started monitor successfully');
+    } catch (err) {
+      logger.error('Could not start monitor, ' + (err.stack ? err.stack : err));
+    }
+
+    let allTests = configObject.test.rounds;
+    let testIdx = 0;
+    let testNum = allTests.length;
+
+    for (let test of allTests) {
+      ++testIdx;
+      await defaultTest(test, clientArgs, (testIdx === testNum));
+    }
+
+    logger.info('---------- Finished Test ----------\n');
     // process.send({
     //     type: 'socket.io',
     //     data: {
-    //         message: '####### Caliper Test #######'
+    //         message: '---------- Finished Test ----------'
     //     }
     // });
-    absConfigFile  = Util.resolvePath(configFile);
-    absNetworkFile = Util.resolvePath(networkFile);
-    blockchain = new Blockchain(absNetworkFile);
-    monitor = new Monitor(absConfigFile);
-    client  = new Client(absConfigFile);
-    createReport();
-    demo.init();
+    printResultsByRound();
+    monitor.printMaxStats();
+    await monitor.stop();
 
-    //let configObject = require(absConfigFile);
-    let configObject = Util.parseYaml(absConfigFile);
-    let networkObject = Util.parseYaml(absNetworkFile);
+    // let date = new Date().toISOString().replace(/-/g,'').replace(/:/g,'').substr(0,15);
+    // let output = path.join(process.cwd(), `report-${date}.html`);
+    const moment = require('moment');
+    let date = moment().format();
+    let output = path.join(__dirname, '../../',
+        `results/report-${date}-${Date.now()}.html`);
+    await report.generate(output);
+    logger.info(`Generated report at ${output}`);
 
-    let skipStart = config.getConfigSetting('core:skipStartScript', false);
-    let skipEnd = config.getConfigSetting('core:skipEndScript', false);
-    skipStart = skipStart === true || skipStart === 'true';
-    skipEnd = skipEnd === true || skipEnd === 'true';
+    client.stop();
 
-    try {
-        if (networkObject.hasOwnProperty('caliper') && networkObject.caliper.hasOwnProperty('command') && networkObject.caliper.command.hasOwnProperty('start')) {
-            if (!networkObject.caliper.command.start.trim()) {
-                throw new Error('Start command is specified but it is empty');
-            }
-            if(!skipStart){
-                await execAsync(networkObject.caliper.command.start);
-            }
+  } catch (err) {
+    logger.error(`Error: ${err.stack ? err.stack : err}`);
+  } finally {
+    demo.stopWatch();
+
+    if (networkObject.hasOwnProperty('caliper') &&
+        networkObject.caliper.hasOwnProperty('command') &&
+        networkObject.caliper.command.hasOwnProperty('end')) {
+      if (!networkObject.caliper.command.end.trim()) {
+        logger.error('End command is specified but it is empty');
+      } else {
+        if (!skipEnd) {
+          await execAsync(networkObject.caliper.command.end);
         }
+      }
+    }
 
-        await blockchain.init();
-        await blockchain.installSmartContract();
-        let numberOfClients = await client.init();
-        let clientArgs = await blockchain.prepareClients(numberOfClients);
-
-        try {
-            await monitor.start();
-            logger.info('Started monitor successfully');
-        } catch (err) {
-            logger.error('Could not start monitor, ' + (err.stack ? err.stack : err));
-        }
-
-        let allTests = configObject.test.rounds;
-        let testIdx = 0;
-        let testNum = allTests.length;
-
-        for (let test of allTests) {
-            ++testIdx;
-            await defaultTest(test, clientArgs, (testIdx === testNum));
-        }
-
-        logger.info('---------- Finished Test ----------\n');
-        // process.send({
-        //     type: 'socket.io',
-        //     data: {
-        //         message: '---------- Finished Test ----------'
-        //     }
-        // });
-        printResultsByRound();
-        monitor.printMaxStats();
-        await monitor.stop();
-
-        // let date = new Date().toISOString().replace(/-/g,'').replace(/:/g,'').substr(0,15);
-        // let output = path.join(process.cwd(), `report-${date}.html`);
-        const moment = require('moment');
-        let date = moment().format();
-        let output = path.join(__dirname, '../../', `results/report-${date}-${Date.now()}.html`);
-        await report.generate(output);
-        logger.info(`Generated report at ${output}`);
-
-        client.stop();
-
-    } catch (err) {
-        logger.error(`Error: ${err.stack ? err.stack : err}`);
-    }finally {
-        demo.stopWatch();
-
-        if (networkObject.hasOwnProperty('caliper') && networkObject.caliper.hasOwnProperty('command') && networkObject.caliper.command.hasOwnProperty('end')) {
-            if (!networkObject.caliper.command.end.trim()) {
-                logger.error('End command is specified but it is empty');
-            } else {
-                if(!skipEnd){
-                    await execAsync(networkObject.caliper.command.end);
-                }
-            }
-        }
-
-        // NOTE: keep the below multi-line formatting intact, otherwise the indents will interfere with the template literal
-        let testSummary = `# Test summary: ${success} succeeded, ${failure} failed #`;
-        logger.info(`
+    // NOTE: keep the below multi-line formatting intact, otherwise the indents will interfere with the template literal
+    let testSummary = `# Test summary: ${success} succeeded, ${failure} failed #`;
+    logger.info(`
 
 ${'#'.repeat(testSummary.length)}
 ${testSummary}
 ${'#'.repeat(testSummary.length)}
 `);
-        // process.send({
-        //     type: 'socket.io',
-        //     data: {
-        //         message: `# Test summary: ${success} succeeded, ${failure} failed #`
-        //     }
-        // });
-    }
+    // process.send({
+    //     type: 'socket.io',
+    //     data: {
+    //         message: `# Test summary: ${success} succeeded, ${failure} failed #`
+    //     }
+    // });
+  }
 };

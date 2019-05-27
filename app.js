@@ -17,12 +17,20 @@ const io = require('socket.io')(server);
 const { fork } = require('child_process');
 const config = require('./src/comm/config-util');
 const path = require('path');
+const fs = require('fs');
 const logger = require('./src/comm/util').getLogger('app.js');
 
 const port = config.getConfigSetting('socket-io:port', 3000);
 
 let isCaliperRunning = false;
 
+const mkResultsDirSync = () => {
+  let dirname = `${__dirname}/results`;
+
+  if (!fs.existsSync(dirname)) {
+    fs.mkdirSync(dirname);
+  }
+};
 const startCaliper = (socket, path, args, callback) => {
   let invoked = false;
 
@@ -94,33 +102,41 @@ const validate = {
   },
 };
 
-app.use('/results', express.static(path.join(__dirname, 'results')));
+/**
+ * Start socket.io Server
+ */
+function start() {
+  mkResultsDirSync();
 
-io.on('connection', socket => {
-  logger.info(`socket.io new connection: ${socket.id}`);
+  app.use('/results', express.static(path.join(__dirname, 'results')));
 
-  socket.on('start-test', target => {
-    validate.running(socket, target);
+  io.on('connection', socket => {
+    logger.info(`socket.io new connection: ${socket.id}`);
+
+    socket.on('start-test', target => {
+      validate.running(socket, target);
+    });
+
   });
 
-});
-
-server.listen(port, () => {
-  require('figlet')(
-      `
+  server.listen(port, () => {
+    require('figlet')(
+        `
       NURI
       Blockchain
       Caliper
       `, {
-        font: 'ANSI Shadow',
-        kerning: 'fitted',
-      }, (err, data) => {
-        console.log(data);
-        // console.log('\n');
-        console.log(
-            `NURI Blockchain Caliper listening on port: ${port}`);
-        console.log('\n');
-        console.log(`pid is ${process.pid}`);
-        console.log('\n');
-      });
-});
+          font: 'ANSI Shadow',
+          kerning: 'fitted',
+        }, (err, data) => {
+          console.log(data);
+          console.log(
+              `NURI Blockchain Caliper listening on port: ${port}`);
+          console.log('\n');
+          console.log(`pid is ${process.pid}`);
+          console.log('\n');
+        });
+  });
+}
+
+start();

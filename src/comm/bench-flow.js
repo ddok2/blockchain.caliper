@@ -442,8 +442,11 @@ module.exports.run = async function(configFile, networkFile) {
         monitor.printMaxStats();
         await monitor.stop();
 
-        let date = new Date().toISOString().replace(/-/g,'').replace(/:/g,'').substr(0,15);
-        let output = path.join(process.cwd(), `report-${date}.html`);
+        // let date = new Date().toISOString().replace(/-/g,'').replace(/:/g,'').substr(0,15);
+        // let output = path.join(process.cwd(), `report-${date}.html`);
+        const moment = require('moment');
+        let date = moment().format();
+        let output = path.join(__dirname, '../../', `results/report-${date}-${Date.now()}.html`);
         await report.generate(output);
         logger.info(`Generated report at ${output}`);
 

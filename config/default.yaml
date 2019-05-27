@@ -16,6 +16,7 @@ core:
         datePattern: YYYY-MM-DD-HH
         maxSize: 5m
         zippedArchive: true
+# socket-io server information
 socket-io:
     host: http://localhost
     port: 4000

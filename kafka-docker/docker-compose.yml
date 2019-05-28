@@ -1,0 +1,99 @@
+version: '2'
+
+networks:
+  basic:
+
+services:
+  zookeeper0:
+    image: zookeeper
+    hostname: zookeeper0
+    ports:
+      - '2181'
+      - '2888'
+      - '3888'
+    environment:
+      - ZOO_MY_ID=1
+      # - ZOO_SERVERS=server.1=zookeeper0:2888:3888 server.2=zookeeper1:2888:3888 server.3=zookeeper2:2888:3888
+    networks:
+      - basic
+  # zookeeper1:
+  #   image: zookeeper
+  #   hostname: zookeeper1
+  #   ports:
+  #     - '2181'
+  #     - '2888'
+  #     - '3888'
+  #   environment:
+  #     - ZOO_MY_ID=2
+  #     - ZOO_SERVERS=server.1=zookeeper0:2888:3888 server.2=zookeeper1:2888:3888 server.3=zookeeper2:2888:3888
+  #   networks:
+  #     - basic
+  # zookeeper2:
+  #   image: zookeeper
+  #   hostname: zookeeper2
+  #   ports:
+  #     - '2181'
+  #     - '2888'
+  #     - '3888'
+  #   environment:
+  #     - ZOO_MY_ID=3
+  #     - ZOO_SERVERS=server.1=zookeeper0:2888:3888 server.2=zookeeper1:2888:3888 server.3=zookeeper2:2888:3888
+  #   networks:
+  #     - basic
+  kafka0:
+    build: .
+    ports:
+      - '9092:9092'
+    depends_on:
+      - zookeeper0
+      # - zookeeper1
+      # - zookeeper2
+    environment:
+      - KAFKA_BROKER_ID=1
+      - KAFKA_ADVERTISED_HOST_NAME=kafka0
+      - KAFKA_MIN_INSYNC_REPLICAS=1
+      - KAFKA_DEFAULT_REPLICATION_FACTOR=3
+      - KAFKA_ZOOKEEPER_CONNECT=zookeeper0:2181
+      # ,zookeeper1:2181,zookeeper2:2181
+    volumes:
+      - ./kafka0:/kafka
+    networks:
+      - basic
+  # kafka1:
+  #   build: .
+  #   ports:
+  #     - '9093:9092'
+  #   depends_on:
+  #     - zookeeper0
+  #     # - zookeeper1
+  #     # - zookeeper2
+  #   environment:
+  #     - KAFKA_BROKER_ID=2
+  #     - KAFKA_ADVERTISED_HOST_NAME=kafka1
+  #     - KAFKA_MIN_INSYNC_REPLICAS=1
+  #     - KAFKA_DEFAULT_REPLICATION_FACTOR=3
+  #     - KAFKA_ZOOKEEPER_CONNECT=zookeeper0:2181
+  #     # ,zookeeper1:2181,zookeeper2:2181
+  #   volumes:
+  #     - ./kafka1:/kafka
+  #   networks:
+  #     - basic
+  # kafka2:
+  #   build: .
+  #   ports:
+  #     - '9094:9092'
+  #   depends_on:
+  #     - zookeeper0
+  #     # - zookeeper1
+  #     # - zookeeper2
+  #   environment:
+  #     - KAFKA_BROKER_ID=3
+  #     - KAFKA_ADVERTISED_HOST_NAME=kafka2
+  #     - KAFKA_MIN_INSYNC_REPLICAS=1
+  #     - KAFKA_DEFAULT_REPLICATION_FACTOR=3
+  #     - KAFKA_ZOOKEEPER_CONNECT=zookeeper0:2181
+  #     # ,zookeeper1:2181,zookeeper2:2181
+  #   volumes:
+  #     - ./kafk2:/kafka
+  #   networks:
+  #     - basic

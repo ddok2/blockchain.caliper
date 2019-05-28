@@ -43,6 +43,6 @@ _site/
 /src/contract/src/github.com/hyperledger/fabric/
 /src/contract/src/github.com/chaincode/exchange-ex/vendor/
 
-/network/nuritelecom/exchange-bc-tls/config/
-/network/nuritelecom/exchange-bc-tls/crypto-config/
-/network/nuritelecom/exchange-bc-tls/hyperledger/
+#/network/nuritelecom/exchange-bc-tls/config/
+#/network/nuritelecom/exchange-bc-tls/crypto-config/
+#/network/nuritelecom/exchange-bc-tls/hyperledger/

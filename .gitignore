@@ -37,11 +37,11 @@ Gemfile.lock
 _site/
 
 # Ignore Hyperledger Custom Files
-/src/contract/.cache/
-/src/contract/bin/
-/src/contract/pkg/
-/src/contract/src/github.com/hyperledger/fabric/
-/src/contract/src/github.com/chaincode/exchange-ex/vendor/
+#/src/contract/.cache/
+#/src/contract/bin/
+#/src/contract/pkg/
+#/src/contract/src/github.com/hyperledger/fabric/
+#/src/contract/src/github.com/chaincode/exchange-ex/vendor/
 
 #/network/nuritelecom/exchange-bc-tls/config/
 #/network/nuritelecom/exchange-bc-tls/crypto-config/

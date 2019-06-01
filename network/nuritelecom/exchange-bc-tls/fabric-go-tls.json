@@ -2,7 +2,7 @@
   "caliper": {
     "blockchain": "fabric",
     "command" : {
-      "start": "docker-compose -f network/nuritelecom/exchange-bc-tls/docker-compose.yml up -d;sleep 3s;",
+      "start": "docker rm $(docker ps -aq) -f;docker-compose -f network/nuritelecom/exchange-bc-tls/docker-compose.yml up -d;sleep 3s;",
       "end" : "docker-compose -f network/nuritelecom/exchange-bc-tls/docker-compose.yml down;docker-compose -f /Users/sung/Development/nuritelecom.com/kafka-docker/docker-compose-single-broker.yml down;docker rm $(docker ps -aq);docker rmi $(docker images dev* -q)"
     }
   },

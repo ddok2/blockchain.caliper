@@ -468,7 +468,13 @@ module.exports.run = async function(configFile, networkFile) {
         `results/report-${date}-${Date.now()}.html`);
     await report.generate(output);
     logger.info(`Generated report at ${output}`);
-
+    console.log(report.data.summary.results);
+    process.send({
+      type: 'socket.io',
+      data: {
+        save: report.data.summary.results,
+      },
+    });
     client.stop();
 
   } catch (err) {
@@ -496,11 +502,5 @@ ${'#'.repeat(testSummary.length)}
 ${testSummary}
 ${'#'.repeat(testSummary.length)}
 `);
-    // process.send({
-    //     type: 'socket.io',
-    //     data: {
-    //         message: `# Test summary: ${success} succeeded, ${failure} failed #`
-    //     }
-    // });
   }
 };

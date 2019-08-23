@@ -17,20 +17,6 @@ const program = require('commander');
 const config = require('../src/comm/config-util');
 
 async function main() {
-
-  // let {
-  //   host = 'http://localhost',
-  //   port = 4000,
-  // } = config.getConfigSetting('socket-io');
-  // const io = require('socket.io-client')(`${host}:${port}`);
-  // const getSocekt = async () => {
-  //   return new Promise((resolve, reject) => {
-  //     io.on('connection', socket => {
-  //       return resolve(socket);
-  //     });
-  //   });
-  // };
-
   program.allowUnknownOption().
       option('-c, --config <file>', 'config file of the benchmark').
       option('-n, --network <file>',
@@ -65,15 +51,7 @@ async function main() {
     return;
   }
 
-  // absConfigFile = path.join(__dirname,
-  //     '../network/nuritelecom/exchange-bc-tls/config.yaml');
-  // absNetworkFile = path.join(__dirname,
-  //     '../network/nuritelecom/exchange-bc-tls/fabric-go-tls.json');
-
   try {
-    // const socket = await getSocekt();
-    // socket.emit('status', {status: 'test will start'});
-
     await framework.run(absConfigFile, absNetworkFile);
     logger.info('Benchmark run successfully');
     process.exit(0);

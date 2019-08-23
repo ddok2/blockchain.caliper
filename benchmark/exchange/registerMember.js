@@ -8,6 +8,8 @@
 const { randomBytes } = require('crypto');
 const moment = require('moment');
 
+const { v4: uuid } = require('uuid');
+
 const info = 'register users';
 
 let account_array = [],
@@ -38,6 +40,7 @@ function generateWorkload() {
 
     workload.push({
       func: 'registerMember',
+      txId: uuid(),
       memberId: userId,
       vsCode: 'v1',
       countryCode: 'ghana',

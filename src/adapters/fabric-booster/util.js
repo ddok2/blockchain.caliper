@@ -215,7 +215,7 @@ async function getAdmin(client, userOrg) {
             certPEM = fs.readFileSync(commUtils.resolvePath(org.user.cert));
         }
         else {
-            let domain = org.domain ? org.domain : (userOrg + '.example.com');
+            let domain = org.domain ? org.domain : (userOrg + '.exchange.com');
             // crypto-dir is already an absolute path
             let basePath = path.join(cryptodir, 'peerOrganizations', domain, 'users', util.format('Admin@%s', domain));
 
@@ -269,7 +269,7 @@ async function getOrdererAdmin(client) {
             certPEM = fs.readFileSync(commUtils.resolvePath(orderer.user.cert));
         }
         else {
-            let domain = orderer.domain ? orderer.domain : 'example.com';
+            let domain = orderer.domain ? orderer.domain : 'exchange.com';
             // crypto-dir is already an absolute path
             let basePath = path.join(cryptodir, 'ordererOrganizations', domain, 'users', util.format('Admin@%s', domain));
 

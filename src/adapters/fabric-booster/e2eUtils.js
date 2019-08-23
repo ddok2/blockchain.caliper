@@ -917,19 +917,21 @@ async function invokebycontext(context, id, version, args, timeout) {
     case 'registerMember':
       url = '/transaction/registeruser';
       form = {
-        memberId: args[0],
-        vsCode: args[1],
-        countryCode: args[2],
-        currencyCode: args[3],
-        memberRole: args[4],
-        walletAddress: args[5],
-        createdDate: args[6],
+        txID: args[0],
+        memberId: args[1],
+        vsCode: args[2],
+        countryCode: args[3],
+        currencyCode: args[4],
+        memberRole: args[5],
+        walletAddress: args[6],
+        createdDate: args[7],
       };
       break;
 
     case 'transferCoin':
       url = '/transfercoin';
       form = {
+        txID: args[0],
         senderWalletAddress: args[0],
         receiverWalletAddress: args[1],
         amount: args[2],

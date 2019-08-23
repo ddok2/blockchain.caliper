@@ -39,8 +39,8 @@ class Fabric extends BlockchainInterface{
         util.init(this.configPath);
         e2eUtils.init(this.configPath);
         try {
-            await impl_create.run(this.configPath);
-            await impl_join.run(this.configPath);
+            // await impl_create.run(this.configPath);
+            // await impl_join.run(this.configPath);
         } catch (err) {
             commLogger.error(`Fabric initialization failed: ${(err.stack ? err.stack : err)}`);
             throw err;
@@ -53,8 +53,8 @@ class Fabric extends BlockchainInterface{
      */
     async installSmartContract() {
         try {
-            await impl_install.run(this.configPath);
-            await impl_instantiate.run(this.configPath);
+            // await impl_install.run(this.configPath);
+            // await impl_instantiate.run(this.configPath);
         } catch (err) {
             commLogger.error(`Fabric chaincode install failed: ${(err.stack ? err.stack : err)}`);
             throw err;

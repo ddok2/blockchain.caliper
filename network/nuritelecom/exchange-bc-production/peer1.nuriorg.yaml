@@ -1,0 +1,31 @@
+version: '2'
+
+networks:
+  exchange:
+    external:
+      name: exchange-net
+
+services:
+  peer1.nuriorg.exchange.com:
+    extends:
+      file: peer-base.yaml
+      service: peer-base
+    container_name: peer1.nuriorg.exchange.com
+    environment:
+      - CORE_PEER_ID=peer1.nuriorg.exchange.com
+      - CORE_PEER_ADDRESS=peer1.nuriorg.exchange.com:7051
+      - CORE_PEER_LISTENADDRESS=0.0.0.0:7051
+      # - CORE_PEER_CHAINCODEADDRESS=peer1.nuriorg.exchange.com:7052
+      # - CORE_PEER_CHAINCODELISTENADDRESS=0.0.0.0:7052
+      - CORE_PEER_GOSSIP_BOOTSTRAP=peer0.nuriorg.exchange.com:7051
+      - CORE_PEER_GOSSIP_EXTERNALENDPOINT=peer1.nuriorg.exchange.com:7051
+      - CORE_PEER_LOCALMSPID=NuriOrgMSP
+    ports:
+      - 8051:7051
+      - 8053:7053
+      - 9444:9443
+      # - '27051:7051'
+      # - '27053:7053'
+    volumes:
+      - ./crypto-config/peerOrganizations/nuriorg.exchange.com/peers/peer1.nuriorg.exchange.com/msp:/etc/hyperledger/fabric/msp
+      - ./crypto-config/peerOrganizations/nuriorg.exchange.com/peers/peer1.nuriorg.exchange.com/tls:/etc/hyperledger/fabric/tls

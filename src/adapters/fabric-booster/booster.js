@@ -53,8 +53,8 @@ class Booster extends BlockchainInterface {
      */
     async installSmartContract() {
         try {
-            await impl_install.run(this.configPath);
-            await impl_instantiate.run(this.configPath);
+            // await impl_install.run(this.configPath);
+            // await impl_instantiate.run(this.configPath);
         } catch (err) {
             commLogger.error(`NURI Fabric chaincode install failed: ${(err.stack
                 ? err.stack

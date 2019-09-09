@@ -1,0 +1,50 @@
+version: '2'
+
+networks:
+  exchange:
+    external:
+      name: exchange-net
+
+services:
+  peer1.nuriorg.exchange.com:
+    extends:
+      file: peer-base.yaml
+      service: peer-base
+    container_name: peer1.nuriorg.exchange.com
+    environment:
+      - CORE_PEER_ID=peer1.nuriorg.exchange.com
+      - CORE_PEER_ADDRESS=peer1.nuriorg.exchange.com:7051
+      - CORE_PEER_LISTENADDRESS=0.0.0.0:7051
+      # - CORE_PEER_CHAINCODEADDRESS=peer1.nuriorg.exchange.com:7052
+      # - CORE_PEER_CHAINCODELISTENADDRESS=0.0.0.0:7052
+      - CORE_PEER_GOSSIP_BOOTSTRAP=peer0.nuriorg.exchange.com:7051
+      - CORE_PEER_GOSSIP_EXTERNALENDPOINT=peer1.nuriorg.exchange.com:7051
+      - CORE_PEER_LOCALMSPID=NuriOrgMSP
+      - CORE_OPERATIONS_LISTENADDRESS=peer1.nuriorg.exchange.com:9443
+      - CORE_METRICS_PROVIDER=prometheus
+      - CORE_METRICS_STATSD_ADDRESS=127.0.0.1:8125
+      - CORE_METRICS_STATSD_NETWORK=udp
+      - CORE_METRICS_STATSD_PREFIX=PEER1_NURI
+#    depends_on:
+#      - couchdb1.nuriorg.exchange.com
+    ports:
+      - 8051:7051
+      #- 8053:7053
+      - 10443:9443
+
+    volumes:
+      - ../crypto-config/peerOrganizations/nuriorg.exchange.com/peers/peer1.nuriorg.exchange.com/msp:/etc/hyperledger/fabric/msp
+      - ../crypto-config/peerOrganizations/nuriorg.exchange.com/peers/peer1.nuriorg.exchange.com/tls:/etc/hyperledger/fabric/tls
+
+#  couchdb1.nuriorg.exchange.com:
+#    container_name: couchdb1.nuriorg.exchange.com
+#    image: hyperledger/fabric-couchdb:0.4.15
+#    # Populate the COUCHDB_USER and COUCHDB_PASSWORD to set an admin user and password
+#    # for CouchDB.  This will prevent CouchDB from operating in an "Admin Party" mode.
+#    environment:
+#      - COUCHDB_USER=
+#      - COUCHDB_PASSWORD=
+#    ports:
+#      - 25984:5984
+#    networks:
+#      - exchange

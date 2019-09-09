@@ -1,0 +1,15 @@
+version: '2'
+
+networks:
+  exchange:
+    external:
+      name: exchange-net
+
+services:
+
+  zookeeper1:
+    extends:
+      file: zookeeper-base.yaml
+      service: zookeeper-base
+    environment:
+      - ZOO_MY_ID=2

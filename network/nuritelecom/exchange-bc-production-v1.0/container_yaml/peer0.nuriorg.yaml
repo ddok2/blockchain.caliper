@@ -1,0 +1,67 @@
+version: '2'
+
+networks:
+  exchange:
+    external:
+      name: exchange-net
+
+services:
+
+  ca.nuriorg.exchange.com:
+    image: hyperledger/fabric-ca:1.4.3
+    environment:
+      - CORE_VM_DOCKER_HOSTCONFIG_NETWORKMODE=exchange-net
+      - FABRIC_CA_HOME=/etc/hyperledger/fabric-ca-server
+      - FABRIC_CA_SERVER_CA_NAME=ca.nuriorg.exchange.com
+      - FABRIC_CA_SERVER_CA_CERTFILE=/etc/hyperledger/fabric-ca-server-config/ca.nuriorg.exchange.com-cert.pem
+      - FABRIC_CA_SERVER_CA_KEYFILE=/etc/hyperledger/fabric-ca-server-config/ad28a58a450fb3432e794dffccbc6526bdf0510ee206fea02a76c60b1e7708d9_sk
+    ports:
+      - "17054:7054"
+    command: sh -c 'fabric-ca-server start -b admin:adminpw -d'
+    volumes:
+      - ../crypto-config/peerOrganizations/nuriorg.exchange.com/ca/:/etc/hyperledger/fabric-ca-server-config
+    container_name: ca.nuriorg.exchange.com
+    networks:
+      - exchange
+
+  peer0.nuriorg.exchange.com:
+    extends:
+      file: peer-base.yaml
+      service: peer-base
+    container_name: peer0.nuriorg.exchange.com
+    environment:
+      - CORE_PEER_ID=peer0.nuriorg.exchange.com
+      - CORE_PEER_ADDRESS=peer0.nuriorg.exchange.com:7051
+      - CORE_PEER_LISTENADDRESS=0.0.0.0:7051
+      # - CORE_PEER_CHAINCODEADDRESS=peer0.nuriorg.exchange.com:7052
+      # - CORE_PEER_CHAINCODELISTENADDRESS=0.0.0.0:7052
+      - CORE_PEER_GOSSIP_BOOTSTRAP=peer1.nuriorg.exchange.com:7051
+      - CORE_PEER_GOSSIP_EXTERNALENDPOINT=peer0.nuriorg.exchange.com:7051
+      - CORE_PEER_LOCALMSPID=NuriOrgMSP
+      - CORE_OPERATIONS_LISTENADDRESS=peer0.nuriorg.exchange.com:9443
+      - CORE_METRICS_PROVIDER=prometheus
+      - CORE_METRICS_STATSD_ADDRESS=127.0.0.1:8125
+      - CORE_METRICS_STATSD_NETWORK=udp
+      - CORE_METRICS_STATSD_PREFIX=PEER0_NURI
+#    depends_on:
+#      - couchdb0.nuriorg.exchange.com
+    ports:
+      - 7051:7051
+    #  - 7053:7053
+      - 9443:9443
+    volumes:
+      - ../crypto-config/peerOrganizations/nuriorg.exchange.com/peers/peer0.nuriorg.exchange.com/msp:/etc/hyperledger/fabric/msp
+      - ../crypto-config/peerOrganizations/nuriorg.exchange.com/peers/peer0.nuriorg.exchange.com/tls:/etc/hyperledger/fabric/tls
+
+#  couchdb0.nuriorg.exchange.com:
+#    container_name: couchdb0.nuriorg.exchange.com
+#    image: hyperledger/fabric-couchdb:0.4.15
+#    # Populate the COUCHDB_USER and COUCHDB_PASSWORD to set an admin user and password
+#    # for CouchDB.  This will prevent CouchDB from operating in an "Admin Party" mode.
+#    environment:
+#      - COUCHDB_USER=
+#      - COUCHDB_PASSWORD=
+#    ports:
+#      - 5984:5984
+#    networks:
+#      - exchange

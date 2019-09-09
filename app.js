@@ -61,18 +61,18 @@ const validate = {
       case 'booster':
         return [
           '-c',
-          'network/nuritelecom/exchange-bc-production/caliper-config/config.yaml',
+          'network/nuritelecom/exchange-bc-production-v1.0/config.yaml',
           '-n',
-          'network/nuritelecom/exchange-bc-production/caliper-config/booster-go-tls.json',
+          'network/nuritelecom/exchange-bc-production-v1.0/booster-go-tls.json',
         ];
 
       case 'fabric':
       default:
         return [
           '-c',
-          'network/nuritelecom/exchange-bc-production/caliper-config/config.yaml',
+          'network/nuritelecom/exchange-bc-production-v1.0/config.yaml',
           '-n',
-          'network/nuritelecom/exchange-bc-production/caliper-config/fabric-go-tls.json',
+          'network/nuritelecom/exchange-bc-production-v1.0/fabric-go-tls.json',
         ];
     }
   },

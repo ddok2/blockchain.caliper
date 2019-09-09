@@ -1,0 +1,24 @@
+version: '2'
+
+networks:
+  exchange:
+    external:
+      name: exchange-net
+
+services:
+  zookeeper0:
+    extends:
+      file: zookeeper-base.yaml
+      service: zookeeper-base
+    environment:
+      - ZOO_MY_ID=1
+
+  kafka0:
+    extends:
+      file: kafka-base.yaml
+      service: kafka-base
+    environment:
+      - KAFKA_BORKER_ID=10
+      - KAFKA_ADVERTISED_HOST_NAME=kafka0
+    ports:
+      - '19092:9092'

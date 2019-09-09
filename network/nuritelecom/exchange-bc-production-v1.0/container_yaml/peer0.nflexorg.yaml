@@ -1,0 +1,67 @@
+version: '2'
+
+networks:
+  exchange:
+    external:
+      name: exchange-net
+
+services:
+
+  ca.nflexorg.exchange.com:
+    image: hyperledger/fabric-ca:1.4.3
+    environment:
+      - CORE_VM_DOCKER_HOSTCONFIG_NETWORKMODE=exchange-net
+      - FABRIC_CA_HOME=/etc/hyperledger/fabric-ca-server
+      - FABRIC_CA_SERVER_CA_NAME=ca.nflexorg.exchange.com
+      - FABRIC_CA_SERVER_CA_CERTFILE=/etc/hyperledger/fabric-ca-server-config/ca.nflexorg.exchange.com-cert.pem
+      - FABRIC_CA_SERVER_CA_KEYFILE=/etc/hyperledger/fabric-ca-server-config/6e859eb9cd70f52caa3dcecfd7f0ec77ba188ae270ad0d4631bf4f499bceba0c_sk
+    ports:
+      - "27054:7054"
+    command: sh -c 'fabric-ca-server start -b admin:adminpw -d'
+    volumes:
+      - ../crypto-config/peerOrganizations/nflexorg.exchange.com/ca/:/etc/hyperledger/fabric-ca-server-config
+    container_name: ca.nflexorg.exchange.com
+    networks:
+      - exchange
+
+  peer0.nflexorg.exchange.com:
+    extends:
+      file: peer-base.yaml
+      service: peer-base
+    container_name: peer0.nflexorg.exchange.com
+    environment:
+      - CORE_PEER_ID=peer0.nflexorg.exchange.com
+      - CORE_PEER_ADDRESS=peer0.nflexorg.exchange.com:7051
+      - CORE_PEER_LISTENADDRESS=0.0.0.0:7051
+      # - CORE_PEER_CHAINCODEADDRESS=peer0.nflexorg.exchange.com:7052
+      # - CORE_PEER_CHAINCODELISTENADDRESS=0.0.0.0:7052
+      - CORE_PEER_GOSSIP_BOOTSTRAP=peer1.nflexorg.exchange.com:7051
+      - CORE_PEER_GOSSIP_EXTERNALENDPOINT=peer0.nflexorg.exchange.com:9051
+      - CORE_PEER_LOCALMSPID=NFlexOrgMSP
+      - CORE_OPERATIONS_LISTENADDRESS=peer0.nflexorg.exchange.com:9443
+      - CORE_METRICS_PROVIDER=prometheus
+      - CORE_METRICS_STATSD_ADDRESS=127.0.0.1:8125
+      - CORE_METRICS_STATSD_NETWORK=udp
+      - CORE_METRICS_STATSD_PREFIX=PEER0_NFLEX
+#    depends_on:
+#      - couchdb0.nflexorg.exchange.com
+    ports:
+      - 9051:7051
+      #- 9053:7053
+      - 11443:9443
+    volumes:
+      - ../crypto-config/peerOrganizations/nflexorg.exchange.com/peers/peer0.nflexorg.exchange.com/msp:/etc/hyperledger/fabric/msp
+      - ../crypto-config/peerOrganizations/nflexorg.exchange.com/peers/peer0.nflexorg.exchange.com/tls:/etc/hyperledger/fabric/tls
+
+#  couchdb0.nflexorg.exchange.com:
+#    container_name: couchdb0.nflexorg.exchange.com
+#    image: hyperledger/fabric-couchdb:0.4.15
+#    # Populate the COUCHDB_USER and COUCHDB_PASSWORD to set an admin user and password
+#    # for CouchDB.  This will prevent CouchDB from operating in an "Admin Party" mode.
+#    environment:
+#      - COUCHDB_USER=
+#      - COUCHDB_PASSWORD=
+#    ports:
+#      - 35984:5984
+#    networks:
+#      - exchange

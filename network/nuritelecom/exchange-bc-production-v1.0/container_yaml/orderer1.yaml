@@ -1,0 +1,35 @@
+version: '2'
+
+networks:
+  exchange:
+    external:
+      name: exchange-net
+
+services:
+  orderer2.exchange.com:
+    extends:
+      file: orderer-base.yaml
+      service: orderer-base
+    container_name: orderer2.exchange.com
+    environment:
+      - ORDERER_OPERATIONS_LISTENADDRESS=orderer2.exchange.com:8443
+    volumes:
+      - ../crypto-config/ordererOrganizations/exchange.com/orderers/orderer2.exchange.com/msp:/var/hyperledger/orderer/msp
+      - ../crypto-config/ordererOrganizations/exchange.com/orderers/orderer2.exchange.com/tls:/var/hyperledger/orderer/tls
+    ports:
+      - 27050:7050
+      - 28443:8443
+
+  orderer3.exchange.com:
+    extends:
+      file: orderer-base.yaml
+      service: orderer-base
+    container_name: orderer3.exchange.com
+    environment:
+      - ORDERER_OPERATIONS_LISTENADDRESS=orderer3.exchange.com:8443
+    volumes:
+      - ../crypto-config/ordererOrganizations/exchange.com/orderers/orderer3.exchange.com/msp:/var/hyperledger/orderer/msp
+      - ../crypto-config/ordererOrganizations/exchange.com/orderers/orderer3.exchange.com/tls:/var/hyperledger/orderer/tls
+    ports:
+      - 37050:7050
+      - 38443:8443

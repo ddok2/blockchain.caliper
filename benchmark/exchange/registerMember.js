@@ -47,7 +47,7 @@ function generateWorkload() {
       currencyCode: 'cedi',
       memberRole: 'test',
       walletAddress: userId,
-      createdDate: moment().format('YY-MM-DD HH:mm:ss'),
+      txTime: moment().format('YY-MM-DD HH:mm:ss'),
     });
   }
   return workload;
@@ -60,6 +60,11 @@ function generateWorkload() {
  */
 const run = function() {
   let args = generateWorkload();
+
+  if (bc.bcType === 'booster') {
+    return bc.invokeSmartContract(contx, 'exchange', '1.0', args, 15000);
+  }
+
   return bc.invokeSmartContract(contx, 'exchange', '1.0', args, 50000);
 };
 

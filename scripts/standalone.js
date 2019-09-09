@@ -51,11 +51,11 @@ async function start() {
   mkResultsDirSync();
 
   program.allowUnknownOption().option('-m, --mode <mode>',
-      'test mode: [fabric, booster]').on('--help', () => {
+      'test mode: [fabric, booster, online]').on('--help', () => {
     console.log('');
     console.log('Examples:');
     console.log('   $ ./start-standalone -m booster');
-    console.log('   $ ./start-standalone --mode fabric');
+    console.log('   $ ./start-standalone --mode online');
   }).parse(process.argv);
 
   let absConfigFile, absNetworkFile;
@@ -75,11 +75,26 @@ async function start() {
         absConfigFile =
             path.join(__dirname,
                 '/../',
-                'network/nuritelecom/exchange-bc-production/caliper-config/config.yaml');
+                'network/nuritelecom/exchange-bc-production-v1.0' +
+                '/caliper-config/config.yaml');
         absNetworkFile =
             path.join(__dirname,
                 '/../',
-                'network/nuritelecom/exchange-bc-production/caliper-config/booster-go-tls.json');
+                'network/nuritelecom/exchange-bc-production-v1.0' +
+                '/caliper-config/booster-go-tls.json');
+        break;
+
+      case 'online':
+        absConfigFile =
+            path.join(__dirname,
+                '/../',
+                'network/nuritelecom/exchange-bc-production-v1.0' +
+                '/caliper-config/host-config.yaml');
+        absNetworkFile =
+            path.join(__dirname,
+                '/../',
+                'network/nuritelecom/exchange-bc-production-v1.0' +
+                '/caliper-config/host-go-tls.json');
         break;
 
       case 'fabric':
@@ -87,11 +102,13 @@ async function start() {
         absConfigFile =
             path.join(__dirname,
                 '/../',
-                'network/nuritelecom/exchange-bc-production/caliper-config/config.yaml');
+                'network/nuritelecom/exchange-bc-production-v1.0' +
+                '/caliper-config/config.yaml');
         absNetworkFile =
             path.join(__dirname,
                 '/../',
-                'network/nuritelecom/exchange-bc-production/caliper-config/fabric-go-tls.json');
+                'network/nuritelecom/exchange-bc-production-v1.0' +
+                '/caliper-config/fabric-go-tls.json');
         break;
     }
   }

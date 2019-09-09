@@ -1,0 +1,29 @@
+version: '2'
+
+
+fabric:
+  chaincodeInstall: false
+
+
+kafka:
+  version: 1.0.0
+  brokers: kafka0:9092
+  topics: booster-topic
+  producerClientID: TxBooster_Producer
+  consumerClientID: TxBooster_Consumer
+  consumerGroupID: boosterConsumerGroup
+  offsetOldest: true
+  log: true
+
+
+#redis:
+#  ip: localhost
+#  port: 6379
+#  auth: true
+#  password: bigsize
+
+
+batch:
+  count: 50
+  lingerMs: 1000
+  maxBytesPerTx: 128

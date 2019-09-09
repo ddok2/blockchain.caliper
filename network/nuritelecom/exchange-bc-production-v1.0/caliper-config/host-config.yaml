@@ -1,0 +1,35 @@
+---
+test:
+  name: NURI Blockchain Test
+  description: test
+  clients:
+    type: local
+    number: 3
+  rounds:
+    - label: registerMember
+      description: Test description for the register an account through the NURI Blockchain
+      txNumber:
+        - 5000
+        - 5000
+        - 5000
+      rateControl:
+        - type: fixed-rate
+          opts:
+            tps: 500
+        - type: fixed-rate
+          opts:
+            tps: 1000
+        - type: fixed-rate
+          opts:
+            tps: 1500
+      arguments:
+        money: 10000
+      callback: benchmark/exchange/registerMember.js
+monitor:
+  type:
+    - process
+  process:
+    - command: node
+      arguments: local-client.js
+      multiOutput: avg
+  interval: 1

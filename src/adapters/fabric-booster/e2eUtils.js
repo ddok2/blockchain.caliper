@@ -924,7 +924,7 @@ async function invokebycontext(context, id, version, args, timeout) {
         currencyCode: args[4],
         memberRole: args[5],
         walletAddress: args[6],
-        createdDate: args[7],
+        txTime: args[7],
       };
       break;
 
@@ -937,6 +937,7 @@ async function invokebycontext(context, id, version, args, timeout) {
         amount: args[2],
         fee: args[3],
         txFlag: args[4],
+        txTime: args[5],
       };
       break;
 

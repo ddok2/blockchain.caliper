@@ -26,3 +26,4 @@ We welcome contributions to the Caliper code base. Please see [Contributing](/CO
 
 ## License
 The Caliper codebase is release under the [Apache 2.0 license](./LICENSE). Any documentation developed by the Caliper Project is licensed under the Creative Commons Attribution 4.0 International License. You may obtain a copy of the license, titled CC-BY-4.0, at http://creativecommons.org/licenses/by/4.0/.
+

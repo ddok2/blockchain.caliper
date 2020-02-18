@@ -2,7 +2,7 @@
   "caliper": {
     "blockchain": "booster",
     "command" : {
-      "start": "network/nuritelecom/exchange-bc-production-v1.0/start.sh; docker exec cli bash -c '/opt/gopath/src/github.com/hyperledger/fabric/peer/scripts/newstart.sh exchange-channel 5 10'; sleep 5s; docker build -t txbooster TxBooster/. --no-cache; docker-compose -f Txbooster/booster.yaml up -d; sleep 5s;",
+      "start": "network/nuritelecom/exchange-bc-production-v1.0/start.sh; docker exec cli bash -c '/opt/gopath/src/github.com/hyperledger/fabric/peer/scripts/newstart.sh exchange-channel 1 10'; sleep 10s; docker build -t txbooster TxBooster/. --no-cache; docker-compose -f Txbooster/booster.yaml up -d; sleep 10s;",
       "end" : "network/nuritelecom/exchange-bc-production-v1.0/stop.sh; docker rm $(docker ps -aqf name=dev-) -f; docker-compose -f Txbooster/booster.yaml down; docker volume rm $(docker volume ls -q); docker rmi $(docker images dev* -q); docker rmi $(docker images txbooster -q);"
     }
   },

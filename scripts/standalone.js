@@ -51,7 +51,7 @@ async function start() {
   mkResultsDirSync();
 
   program.allowUnknownOption().option('-m, --mode <mode>',
-      'test mode: [fabric, booster, online]').on('--help', () => {
+      'test mode: [fabric, booster, online, localhost]').on('--help', () => {
     console.log('');
     console.log('Examples:');
     console.log('   $ ./start-standalone -m booster');
@@ -82,6 +82,19 @@ async function start() {
                 '/../',
                 'network/nuritelecom/exchange-bc-production-v1.0' +
                 '/caliper-config/booster-go-tls.json');
+        break;
+
+      case 'localhost':
+        absConfigFile =
+            path.join(__dirname,
+                '/../',
+                'network/nuritelecom/exchange-bc-production-v1.0' +
+                '/caliper-config/host-config.yaml');
+        absNetworkFile =
+            path.join(__dirname,
+                '/../',
+                'network/nuritelecom/exchange-bc-production-v1.0' +
+                '/caliper-config/local-go-tls.json');
         break;
 
       case 'online':

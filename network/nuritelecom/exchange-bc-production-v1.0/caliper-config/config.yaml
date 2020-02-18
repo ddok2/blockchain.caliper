@@ -9,9 +9,9 @@ test:
     - label: registerMember
       description: Test description for the register an account through the NURI Blockchain
       txNumber:
-        - 5000
-        - 5000
-        - 5000
+        - 500
+        - 1000
+        - 1500
       rateControl:
         - type: fixed-rate
           opts:

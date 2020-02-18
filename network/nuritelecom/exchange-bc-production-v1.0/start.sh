@@ -12,4 +12,4 @@ docker-compose -f peer1.nuriorg.yaml up -d
 docker-compose -f peer0.nflexorg.yaml up -d
 docker-compose -f peer1.nflexorg.yaml up -d
 
-docker exec -it cli bash
+#docker exec -it cli bash

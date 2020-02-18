@@ -58,7 +58,7 @@ client:
 
   # Root of the MSP directories with keys and certs.
   cryptoconfig:
-    path: /Users/kurzweil/hf2/exchange-bc-production-qa/crypto-config
+    path: /Users/kurzweil/hf/exchange-bc-production-v1.0/crypto-config
 
   # Some SDKs support pluggable KV stores, the properties under "credentialStore"
   # are implementation specific
@@ -126,7 +126,7 @@ channels:
         # produce events but the app typically only needs to connect to one to listen to events.
         # Default: true
         eventSource: true
-      peer1.nuriorg.exchange.com:
+#      peer1.nuriorg.exchange.com:
 
     policies:
       #[Optional] options for retrieving channel configuration blocks
@@ -153,10 +153,10 @@ channels:
 organizations:
   NuriOrg:
     mspid: NuriOrgMSP
-    cryptoPath: /Users/kurzweil/hf2/exchange-bc-production-qa/crypto-config/peerOrganizations/nuriorg.exchange.com/users/{userName}@nuriorg.exchange.com/msp
+    cryptoPath: /Users/kurzweil/hf/exchange-bc-production-v1.0/crypto-config/peerOrganizations/nuriorg.exchange.com/users/{userName}@nuriorg.exchange.com/msp
     peers:
       - peer0.nuriorg.exchange.com
-      - peer1.nuriorg.exchange.com
+#      - peer1.nuriorg.exchange.com
 #      - peer1.org1.hf.chainhero.io
 
     # [Optional]. Certificate Authorities issue certificates for identification purposes in a Fabric based
@@ -192,10 +192,10 @@ orderers:
 
     tlsCACerts:
       # Certificate location absolute path
-      path: /Users/kurzweil/hf2/exchange-bc-production-qa/crypto-config/ordererOrganizations/exchange.com/tlsca/tlsca.exchange.com-cert.pem
+      path: /Users/kurzweil/hf/exchange-bc-production-v1.0/crypto-config/ordererOrganizations/exchange.com/tlsca/tlsca.exchange.com-cert.pem
 
   orderer1.exchange.com:
-    url: orderer1.exchange.com:17050
+    url: orderer1.exchange.com:7050
 
     # these are standard properties defined by the gRPC library
     # they will be passed in as-is to gRPC client constructor
@@ -213,9 +213,9 @@ orderers:
 
     tlsCACerts:
       # Certificate location absolute path
-      path: /Users/kurzweil/hf2/exchange-bc-production-qa/crypto-config/ordererOrganizations/exchange.com/tlsca/tlsca.exchange.com-cert.pem
+      path: /Users/kurzweil/hf/exchange-bc-production-v1.0/crypto-config/ordererOrganizations/exchange.com/tlsca/tlsca.exchange.com-cert.pem
   orderer2.exchange.com:
-    url: orderer2.exchange.com:27050
+    url: orderer2.exchange.com:7050
 
     # these are standard properties defined by the gRPC library
     # they will be passed in as-is to gRPC client constructor
@@ -233,9 +233,9 @@ orderers:
 
     tlsCACerts:
       # Certificate location absolute path
-      path: /Users/kurzweil/hf2/exchange-bc-production-qa/crypto-config/ordererOrganizations/exchange.com/tlsca/tlsca.exchange.com-cert.pem
+      path: /Users/kurzweil/hf/exchange-bc-production-v1.0/crypto-config/ordererOrganizations/exchange.com/tlsca/tlsca.exchange.com-cert.pem
   orderer3.exchange.com:
-    url: orderer3.exchange.com:37050
+    url: orderer3.exchange.com:7050
 
     # these are standard properties defined by the gRPC library
     # they will be passed in as-is to gRPC client constructor
@@ -253,7 +253,7 @@ orderers:
 
     tlsCACerts:
       # Certificate location absolute path
-      path: /Users/kurzweil/hf2/exchange-bc-production-qa/crypto-config/ordererOrganizations/exchange.com/tlsca/tlsca.exchange.com-cert.pem
+      path: /Users/kurzweil/hf/exchange-bc-production-v1.0/crypto-config/ordererOrganizations/exchange.com/tlsca/tlsca.exchange.com-cert.pem
 
 # List of peers to send various requests to, including endorsement, query
 # and event listener registration.
@@ -279,73 +279,73 @@ peers:
 
     tlsCACerts:
       # Certificate location absolute path
-      path: /Users/kurzweil/hf2/exchange-bc-production-qa/crypto-config/peerOrganizations/nuriorg.exchange.com/tlsca/tlsca.nuriorg.exchange.com-cert.pem
+      path: /Users/kurzweil/hf/exchange-bc-production-v1.0/crypto-config/peerOrganizations/nuriorg.exchange.com/tlsca/tlsca.nuriorg.exchange.com-cert.pem
 
-  peer1.nuriorg.exchange.com:
-    # this URL is used to send endorsement and query requests
-    url: peer1.nuriorg.exchange.com:7051
-    # eventUrl is only needed when using eventhub (default is delivery service)
-    eventUrl: peer1.nuriorg.exchange.com:7053
+#  peer1.nuriorg.exchange.com:
+#    # this URL is used to send endorsement and query requests
+#    url: peer1.nuriorg.exchange.com:8051
+#    # eventUrl is only needed when using eventhub (default is delivery service)
+#    eventUrl: peer1.nuriorg.exchange.com:8053
+#
+#    grpcOptions:
+#      ssl-target-name-override: peer1.nuriorg.exchange.com
+#      # These parameters should be set in coordination with the keepalive policy on the server,
+#      # as incompatible settings can result in closing of connection.
+#      # When duration of the 'keep-alive-time' is set to 0 or less the keep alive client parameters are disabled
+#      keep-alive-time: 0s
+#      keep-alive-timeout: 20s
+#      keep-alive-permit: false
+#      fail-fast: false
+#      # allow-insecure will be taken into consideration if address has no protocol defined, if true then grpc or else grpcs
+#      allow-insecure: false
+#
+#    tlsCACerts:
+#      # Certificate location absolute path
+#      path: /Users/kurzweil/hf/exchange-bc-production-v1.0/crypto-config/peerOrganizations/nuriorg.exchange.com/tlsca/tlsca.nuriorg.exchange.com-cert.pem
 
-    grpcOptions:
-      ssl-target-name-override: peer1.nuriorg.exchange.com
-      # These parameters should be set in coordination with the keepalive policy on the server,
-      # as incompatible settings can result in closing of connection.
-      # When duration of the 'keep-alive-time' is set to 0 or less the keep alive client parameters are disabled
-      keep-alive-time: 0s
-      keep-alive-timeout: 20s
-      keep-alive-permit: false
-      fail-fast: false
-      # allow-insecure will be taken into consideration if address has no protocol defined, if true then grpc or else grpcs
-      allow-insecure: false
-
-    tlsCACerts:
-      # Certificate location absolute path
-      path: /Users/kurzweil/hf2/exchange-bc-production-qa/crypto-config/peerOrganizations/nuriorg.exchange.com/tlsca/tlsca.nuriorg.exchange.com-cert.pem
-
-  peer0.nflexorg.exchange.com:
-    # this URL is used to send endorsement and query requests
-    url: peer0.nflexorg.exchange.com:7051
-    # eventUrl is only needed when using eventhub (default is delivery service)
-    eventUrl: peer0.nflexorg.exchange.com:7053
-
-    grpcOptions:
-      ssl-target-name-override: peer0.nflexorg.exchange.com
-      # These parameters should be set in coordination with the keepalive policy on the server,
-      # as incompatible settings can result in closing of connection.
-      # When duration of the 'keep-alive-time' is set to 0 or less the keep alive client parameters are disabled
-      keep-alive-time: 0s
-      keep-alive-timeout: 20s
-      keep-alive-permit: false
-      fail-fast: false
-      # allow-insecure will be taken into consideration if address has no protocol defined, if true then grpc or else grpcs
-      allow-insecure: false
-
-    tlsCACerts:
-      # Certificate location absolute path
-      path: /Users/kurzweil/hf2/exchange-bc-production-qa/crypto-config/peerOrganizations/nflexorg.exchange.com/tlsca/tlsca.nflexorg.exchange.com-cert.pem
-
-  peer1.nflexorg.exchange.com:
-    # this URL is used to send endorsement and query requests
-    url: peer1.nflexorg.exchange.com:7051
-    # eventUrl is only needed when using eventhub (default is delivery service)
-    eventUrl: peer1.nflexorg.exchange.com:7053
-
-    grpcOptions:
-      ssl-target-name-override: peer1.nflexorg.exchange.com
-      # These parameters should be set in coordination with the keepalive policy on the server,
-      # as incompatible settings can result in closing of connection.
-      # When duration of the 'keep-alive-time' is set to 0 or less the keep alive client parameters are disabled
-      keep-alive-time: 0s
-      keep-alive-timeout: 20s
-      keep-alive-permit: false
-      fail-fast: false
-      # allow-insecure will be taken into consideration if address has no protocol defined, if true then grpc or else grpcs
-      allow-insecure: false
-
-    tlsCACerts:
-      # Certificate location absolute path
-      path: /Users/kurzweil/hf2/exchange-bc-production-qa/crypto-config/peerOrganizations/nflexorg.exchange.com/tlsca/tlsca.nflexorg.exchange.com-cert.pem
+#  peer0.nflexorg.exchange.com:
+#    # this URL is used to send endorsement and query requests
+#    url: peer0.nflexorg.exchange.com:9051
+#    # eventUrl is only needed when using eventhub (default is delivery service)
+#    eventUrl: peer0.nflexorg.exchange.com:9053
+#
+#    grpcOptions:
+#      ssl-target-name-override: peer0.nflexorg.exchange.com
+#      # These parameters should be set in coordination with the keepalive policy on the server,
+#      # as incompatible settings can result in closing of connection.
+#      # When duration of the 'keep-alive-time' is set to 0 or less the keep alive client parameters are disabled
+#      keep-alive-time: 0s
+#      keep-alive-timeout: 20s
+#      keep-alive-permit: false
+#      fail-fast: false
+#      # allow-insecure will be taken into consideration if address has no protocol defined, if true then grpc or else grpcs
+#      allow-insecure: false
+#
+#    tlsCACerts:
+#      # Certificate location absolute path
+#      path: /Users/kurzweil/hf/exchange-bc-production-qa/crypto-config/peerOrganizations/nflexorg.exchange.com/tlsca/tlsca.nflexorg.exchange.com-cert.pem
+#
+#  peer1.nflexorg.exchange.com:
+#    # this URL is used to send endorsement and query requests
+#    url: peer1.nflexorg.exchange.com:10051
+#    # eventUrl is only needed when using eventhub (default is delivery service)
+#    eventUrl: peer1.nflexorg.exchange.com:10053
+#
+#    grpcOptions:
+#      ssl-target-name-override: peer1.nflexorg.exchange.com
+#      # These parameters should be set in coordination with the keepalive policy on the server,
+#      # as incompatible settings can result in closing of connection.
+#      # When duration of the 'keep-alive-time' is set to 0 or less the keep alive client parameters are disabled
+#      keep-alive-time: 0s
+#      keep-alive-timeout: 20s
+#      keep-alive-permit: false
+#      fail-fast: false
+#      # allow-insecure will be taken into consideration if address has no protocol defined, if true then grpc or else grpcs
+#      allow-insecure: false
+#
+#    tlsCACerts:
+#      # Certificate location absolute path
+#      path: /Users/kurzweil/hf/exchange-bc-production-qa/crypto-config/peerOrganizations/nflexorg.exchange.com/tlsca/tlsca.nflexorg.exchange.com-cert.pem
 
 #
 # Fabric-CA is a special kind of Certificate Authority provided by Hyperledger Fabric which allows
@@ -366,7 +366,7 @@ certificateAuthorities:
     caName: ca.nuriorg.exchange.com
     tlsCACerts:
       # Certificate location absolute path
-      path: /Users/kurzweil/hf2/exchange-bc-production-qa/crypto-config/peerOrganizations/nuriorg.exchange.com/ca/ca.nuriorg.exchange.com-cert.pem
+      path: /Users/kurzweil/hf/exchange-bc-production-v1.0/crypto-config/peerOrganizations/nuriorg.exchange.com/ca/ca.nuriorg.exchange.com-cert.pem
 
 entityMatchers:
   peer:
@@ -377,20 +377,20 @@ entityMatchers:
       mappedHost: peer0.nuriorg.exchange.com
 
     - pattern: (\w*)peer1.nuriorg.exchange.com(\w*)
-      urlSubstitutionExp: peer1.nuriorg.exchange.com:7051
-      eventUrlSubstitutionExp: peer1.nuriorg.exchange.com:7053
+      urlSubstitutionExp: peer1.nuriorg.exchange.com:8051
+      eventUrlSubstitutionExp: peer1.nuriorg.exchange.com:8053
       sslTargetOverrideUrlSubstitutionExp: peer1.nuriorg.exchange.com
       mappedHost: peer1.nuriorg.exchange.com
 
     - pattern: (\w*)peer0.nflexorg.exchange.com(\w*)
-      urlSubstitutionExp: peer0.nflexorg.exchange.com:7051
-      eventUrlSubstitutionExp: peer0.nflexorg.exchange.com:7053
+      urlSubstitutionExp: peer0.nflexorg.exchange.com:9051
+      eventUrlSubstitutionExp: peer0.nflexorg.exchange.com:9053
       sslTargetOverrideUrlSubstitutionExp: peer0.nflexorg.exchange.com
       mappedHost: peer0.nflexorg.exchange.com
 
     - pattern: (\w*)peer1.nflexorg.exchange.com(\w*)
-      urlSubstitutionExp: peer1.nflexorg.exchange.com:7051
-      eventUrlSubstitutionExp: peer1.nflexorg.exchange.com:7053
+      urlSubstitutionExp: peer1.nflexorg.exchange.com:10051
+      eventUrlSubstitutionExp: peer1.nflexorg.exchange.com:10053
       sslTargetOverrideUrlSubstitutionExp: peer1.nflexorg.exchange.com
       mappedHost: peer1.nflexorg.exchange.com
 #    - pattern: (\w*)peer1.org1.hf.chainhero.io(\w*)
@@ -405,7 +405,7 @@ entityMatchers:
       sslTargetOverrideUrlSubstitutionExp: orderer0.exchange.com
       mappedHost: orderer0.exchange.com
 
-    - pattern: (\w*)orderer1.exchange.com(\w*)s
+    - pattern: (\w*)orderer1.exchange.com(\w*)
       urlSubstitutionExp: orderer1.exchange.com:7050
       sslTargetOverrideUrlSubstitutionExp: orderer1.exchange.com
       mappedHost: orderer1.exchange.com

@@ -1,0 +1,90 @@
+{
+  "caliper": {
+    "blockchain": "booster"
+  },
+  "booster": {
+    "hostname": "txbooster",
+    "port": "8080"
+  },
+  "fabric": {
+    "cryptodir": "network/nuritelecom/exchange-bc-production-v1.0/crypto-config",
+    "network": {
+      "orderer": {
+        "url": "grpcs://orderer1.exchange.com:17050",
+        "mspid": "OrdererMSP",
+        "msp": "network/nuritelecom/exchange-bc-production-v1.0/crypto-config/ordererOrganizations/exchange.com/msp/",
+        "server-hostname": "orderer1.exchange.com",
+        "tls_cacerts": "network/nuritelecom/exchange-bc-production-v1.0/crypto-config/ordererOrganizations/exchange.com/orderers/orderer1.exchange.com/tls/ca.crt"
+      },
+      "nuriorg": {
+        "name": "NuriOrg",
+        "mspid": "NuriOrgMSP",
+        "msp": "network/nuritelecom/exchange-bc-production-v1.0/crypto-config/peerOrganizations/nuriorg.exchange.com/msp/",
+        "ca": {
+          "url": "http://ca.nuriorg.exchange.com:17054",
+          "name": "ca.nuriorg.exchange.com"
+        },
+        "peer1": {
+          "requests": "grpcs://peer0.nuriorg.exchange.com:7051",
+          "events": "grpcs://peer0.nuriorg.exchange.com:7053",
+          "server-hostname": "peer0.nuriorg.exchange.com",
+          "tls_cacerts": "network/nuritelecom/exchange-bc-production-v1.0/crypto-config/peerOrganizations/nuriorg.exchange.com/peers/peer0.nuriorg.exchange.com/tls/ca.crt"
+        }
+      }
+    },
+    "channel": [
+      {
+        "name": "exchange-channel",
+        "deployed": false,
+        "config": "network/nuritelecom/exchange-bc-production-v1.0/channel-artifacts/channel.tx",
+        "organizations": [
+          "nuriorg"
+        ]
+      }
+    ],
+    "chaincodes": [
+      {
+        "id": "exchange",
+        "path": "github.com/chaincode/exchange-ex",
+        "language": "golang",
+        "version": "1.0",
+        "channel": "exchange-channel"
+      }
+    ],
+    "endorsement-policy": {
+      "identities": [
+        {
+          "role": {
+            "name": "member",
+            "mspId": "NuriOrgMSP"
+          }
+        },
+        {
+          "role": {
+            "name": "member",
+            "mspId": "NFlexOrgMSP"
+          }
+        }
+      ],
+      "policy": {
+        "2-of": [
+          {
+            "signed-by": 0
+          },
+          {
+            "signed-by": 1
+          }
+        ]
+      }
+    },
+    "context": {
+      "registerMember": "exchange-channel"
+    }
+  },
+  "info": {
+    "Version": "1.4.6",
+    "Size": "2 Orgs with 4 Peers with TxBooster",
+    "Orderer": "5 Orderers",
+    "Distribution": "NURI Telecom Exchange-bc-production with TxBooster"
+  }
+}

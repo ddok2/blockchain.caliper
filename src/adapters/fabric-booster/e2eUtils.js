@@ -915,7 +915,7 @@ async function invokebycontext(context, id, version, args, timeout) {
 
   switch (proposalRequest.fcn) {
     case 'registerMember':
-      url = '/transaction/registeruser';
+      url = '/api/v1/transaction/registeruser';
       form = {
         txID: args[0],
         memberId: args[1],

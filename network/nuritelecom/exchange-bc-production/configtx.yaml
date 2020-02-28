@@ -24,7 +24,7 @@ Organizations:
         Name: ExchangeOrderer
 
         # ID to load the MSP definition as
-        ID: OrdererMSP 
+        ID: OrdererMSP
 
         # MSPDir is the filesystem path which contains the MSP configuration
         MSPDir: crypto-config/ordererOrganizations/exchange.com/msp
@@ -61,7 +61,7 @@ Organizations:
             # for cross org gossip communication.  Note, this value is only
             # encoded in the genesis block in the Application section context
             - Host: peer0.nflexorg.exchange.com
-              Port: 7051
+              Port: 9051
 
 
 ################################################################################
@@ -144,7 +144,7 @@ Orderer: &OrdererDefaults
     OrdererType: kafka
 
     Addresses:
-        - orderer0.exchange.com:7050 
+        - orderer0.exchange.com:7050
         - orderer1.exchange.com:7050
         - orderer2.exchange.com:7050
         - orderer3.exchange.com:7050
@@ -172,7 +172,7 @@ Orderer: &OrdererDefaults
         # NOTE: Use IP:port notation
         Brokers:
             - kafka0:9092
-            - kafka1:9092 
+            - kafka1:9092
             - kafka2:9092
             #- kafka3:9092
 

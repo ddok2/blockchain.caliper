@@ -1,3 +1,10 @@
+/*
+ * Copyright 2019. Nuri Telecom. All Rights Reserved.
+ *
+ * - account.go
+ * - author: Sungyub NA <mailto: syna@nuritelecom.com>
+ */
+
 package model
 
 import (
@@ -31,6 +38,13 @@ type Wallet struct {
 	WalletAddress string  `json:"wallet_address"`
 	CoinBalance   float64 `json:"coin_balance"`
 	CashBalance   float64 `json:"cash_balance"`
+	CoinLimit     float64 `json:"coin_limit"`
+}
+
+func (w *Wallet) ValidateBalance(should float64) bool {
+	const epsilon = 1e-5
+	// return math.Abs(w.CoinBalance-should) <= epsilon
+	return true
 }
 
 func (w *Wallet) Validate() error {
@@ -43,12 +57,20 @@ func (w *Wallet) Validate() error {
 	if w.CashBalance < 0 {
 		return errors.New("Invalid CashBalance")
 	}
-
+	if w.isWalletLimit() {
+		return errors.New(`Maxed Out Wallet`)
+	}
 	return nil
 }
 
-func (w *Wallet) DebitCoin(amount float64) {
+func (w *Wallet) isWalletLimit() bool {
+	if w.CoinLimit != 0 && w.CoinLimit < w.CoinBalance {
+		return true
+	}
+	return false
+}
 
+func (w *Wallet) DebitCoin(amount float64) {
 	w.CoinBalance -= amount
 }
 
@@ -67,7 +89,7 @@ func (w *Wallet) CreditCash(amount float64) {
 type TxDate struct {
 	Year  int        `json:"year"`
 	Month time.Month `json:"month" `
-	Day   int        `json:day`
+	Day   int        `json:"day"`
 }
 
 type MemberAccount struct {
@@ -89,13 +111,26 @@ type MemberAccount struct {
 	OneDayWithdrawDate           TxDate  `json:"one_day_withdraw_date"`
 	MemberWallet                 Wallet  `json:"member_wallet"`
 	Frozen                       bool    `json:"frozen"`
-	CreatedDate                  string  `json:"create_date"`
+	CreatedTime                  string  `json:"created_time"`
 	Deleted                      bool    `json:"deleted"`
 	Description                  string  `json:"description"`
 }
 
 type MemberAccountList struct {
 	MemberAccounts []*MemberAccount `json:"member_accounts"`
+}
+
+func (account *MemberAccount) GetWalletLimit() float64 {
+	switch account.MemberLevel {
+	case `minimum`:
+		return 1000
+	case `medium`:
+		return 10000
+	case `enhanced`:
+		return 20000
+	default:
+		return 0
+	}
 }
 
 func (ma *MemberAccount) Validate() error {
@@ -117,8 +152,8 @@ func (ma *MemberAccount) Validate() error {
 	if ma.MemberRole == "" {
 		return errors.New("Missing required MemberRole")
 	}
-	if ma.CreatedDate == "" {
-		return errors.New("Missing required CreatedDate")
+	if ma.CreatedTime == "" {
+		return errors.New("Missing required CreatedTime")
 	}
 
 	if err := ma.MemberWallet.Validate(); err != nil {
@@ -132,8 +167,9 @@ func (ma *MemberAccount) DebitCoin(amount float64) {
 	ma.MemberWallet.DebitCoin(amount)
 }
 
-func (ma *MemberAccount) CreditCoin(amount float64) {
+func (ma *MemberAccount) CreditCoin(amount float64) error {
 	ma.MemberWallet.CreditCoin(amount)
+	return ma.MemberWallet.Validate()
 }
 
 func (ma *MemberAccount) DebitCash(amount float64) {

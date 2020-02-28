@@ -1,0 +1,35 @@
+version: '2'
+
+networks:
+  exchange:
+    external:
+      name: exchange-net
+
+services:
+  orderer0.exchange.com:
+    extends:
+      file: orderer-base.yaml
+      service: orderer-base
+    container_name: orderer0.exchange.com
+    volumes:
+      - ../crypto-config/ordererOrganizations/exchange.com/orderers/orderer0.exchange.com/msp:/var/hyperledger/orderer/msp
+      - ../crypto-config/ordererOrganizations/exchange.com/orderers/orderer0.exchange.com/tls:/var/hyperledger/orderer/tls
+      - ../volumes/orderer0.exchange.com:/var/hyperledger/production/orderer
+    ports:
+      - 7050:7050
+      - 8443:8443
+
+  orderer1.exchange.com:
+    extends:
+      file: orderer-base.yaml
+      service: orderer-base
+    container_name: orderer1.exchange.com
+    environment:
+      - ORDERER_GENERAL_LISTENPORT=8050
+    volumes:
+      - ../crypto-config/ordererOrganizations/exchange.com/orderers/orderer1.exchange.com/msp:/var/hyperledger/orderer/msp
+      - ../crypto-config/ordererOrganizations/exchange.com/orderers/orderer1.exchange.com/tls:/var/hyperledger/orderer/tls
+      - ../volumes/orderer1.exchange.com:/var/hyperledger/production/orderer
+    ports:
+      - 8050:8050
+      - 18443:8443

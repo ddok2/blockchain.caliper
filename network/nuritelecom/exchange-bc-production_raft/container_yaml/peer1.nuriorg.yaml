@@ -1,0 +1,49 @@
+version: '2'
+
+networks:
+  exchange:
+    external:
+      name: exchange-net
+
+services:
+  peer1.nuriorg.exchange.com:
+    extends:
+      file: peer-base.yaml
+      service: peer-base
+    container_name: peer1.nuriorg.exchange.com
+    environment:
+      - CORE_PEER_ID=peer1.nuriorg.exchange.com
+      - CORE_PEER_ADDRESS=peer1.nuriorg.exchange.com:8051
+      - CORE_PEER_LISTENADDRESS=0.0.0.0:8051
+      - CORE_PEER_CHAINCODEADDRESS=peer1.nuriorg.exchange.com:8052
+      - CORE_PEER_CHAINCODELISTENADDRESS=0.0.0.0:8052
+      - CORE_PEER_GOSSIP_BOOTSTRAP=peer0.nuriorg.exchange.com:7051
+      - CORE_PEER_GOSSIP_EXTERNALENDPOINT=peer1.nuriorg.exchange.com:8051
+      - CORE_PEER_LOCALMSPID=NuriOrgMSP
+      - CORE_LEDGER_STATE_STATEDATABASE=CouchDB
+      - CORE_LEDGER_STATE_COUCHDBCONFIG_COUCHDBADDRESS=couchdb1.nuriorg.exchange.com:5984
+      - CORE_LEDGER_STATE_COUCHDBCONFIG_USERNAME=
+      - CORE_LEDGER_STATE_COUCHDBCONFIG_PASSWORD=
+    depends_on:
+      - couchdb1.nuriorg.exchange.com
+    ports:
+      - 8051:8051
+      # prometheus metrics port
+      - 10443:9443
+    volumes:
+      - ../crypto-config/peerOrganizations/nuriorg.exchange.com/peers/peer1.nuriorg.exchange.com/msp:/etc/hyperledger/fabric/msp
+      - ../crypto-config/peerOrganizations/nuriorg.exchange.com/peers/peer1.nuriorg.exchange.com/tls:/etc/hyperledger/fabric/tls
+      - ../volumes/peer1.nuriorg.exchange.com:/var/hyperledger/production
+
+  couchdb1.nuriorg.exchange.com:
+    container_name: couchdb1.nuriorg.exchange.com
+    image: hyperledger/fabric-couchdb:$HF_TOOL_IMAGE_VERSION
+    environment:
+      - COUCHDB_USER=
+      - COUCHDB_PASSWORD=
+    ports:
+      - 25984:5984
+    volumes:
+      - ../volumes/couchdb1.nuriorg.exchange.com:/opt/couchdb/data
+    networks:
+      - exchange

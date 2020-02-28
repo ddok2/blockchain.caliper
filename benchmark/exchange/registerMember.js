@@ -48,6 +48,7 @@ function generateWorkload() {
       memberRole: 'test',
       walletAddress: userId,
       txTime: moment().format('YY-MM-DD HH:mm:ss'),
+      memberLevel: 'Unlimited'
     });
   }
   return workload;

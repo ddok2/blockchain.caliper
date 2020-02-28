@@ -2,8 +2,8 @@
   "caliper": {
     "blockchain": "fabric",
     "command": {
-      "start": "network/nuritelecom/exchange-bc-production/start.sh; docker exec cli bash -c '/opt/gopath/src/github.com/hyperledger/fabric/peer/scripts/start.sh exchange-channel 1 5';  sleep 5s; ",
-      "end": "network/nuritelecom/exchange-bc-production/stop.sh; docker rm $(docker ps -aqf name=dev-) -f; docker volume rm $(docker volume ls -q); docker rmi $(docker images dev* -q)"
+      "start": "#network/nuritelecom/exchange-bc-production/start.sh; docker exec cli bash -c '/opt/gopath/src/github.com/hyperledger/fabric/peer/scripts/start.sh exchange-channel 1 5';  sleep 5s; ",
+      "end": "#network/nuritelecom/exchange-bc-production/stop.sh; docker rm $(docker ps -aqf name=dev-) -f; docker volume rm $(docker volume ls -q); docker rmi $(docker images dev* -q)"
     }
   },
   "fabric": {

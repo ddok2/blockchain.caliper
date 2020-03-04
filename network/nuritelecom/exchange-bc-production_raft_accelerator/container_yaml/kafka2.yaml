@@ -1,0 +1,30 @@
+version: '2'
+
+networks:
+  exchange:
+    external:
+      name: exchange-net
+
+services:
+  zookeeper2:
+    extends:
+      file: zookeeper-base.yaml
+      service: zookeeper-base
+    environment:
+      - ZOO_MY_ID=3
+    volumes:
+      - ../volumes/zookeeper2_data:/data
+      - ../volumes/zookeeper2_log:/datalog
+
+  kafka2:
+    extends:
+      file: kafka-base.yaml
+      service: kafka-base
+    environment:
+      - KAFKA_BORKER_ID=12
+      - KAFKA_ADVERTISED_HOST_NAME=kafka2
+    ports:
+      - '19094:9092'
+    volumes:
+      - ../volumes/kafka2_data:/tmp/kafka-logs
+      - ../volumes/kafka2_logs:/opt/kafka/logs

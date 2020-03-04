@@ -51,7 +51,7 @@ async function start() {
   mkResultsDirSync();
 
   program.allowUnknownOption().option('-m, --mode <mode>',
-      'test mode: [fabric, booster, online, localhost, raft]',
+      'test mode: [fabric, booster, online, localhost, raft, accelerator]',
   ).on('--help', () => {
     console.log('');
     console.log('Examples:');
@@ -122,6 +122,19 @@ async function start() {
                 '/../',
                 'network/nuritelecom/exchange-bc-production_raft' +
                 '/caliper-config/fabric-go-tls.json');
+        break;
+
+      case 'accelerator':
+        absConfigFile =
+            path.join(__dirname,
+                '/../',
+                'network/nuritelecom/exchange-bc-production_raft_accelerator' +
+                '/caliper-config/host-config.yaml');
+        absNetworkFile =
+            path.join(__dirname,
+                '/../',
+                'network/nuritelecom/exchange-bc-production_raft_accelerator' +
+                '/caliper-config/accelerator-go.json');
         break;
 
       case 'fabric':

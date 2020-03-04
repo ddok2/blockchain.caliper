@@ -1,0 +1,79 @@
+version: '2'
+
+networks:
+  exchange:
+    external:
+      name: exchange-net
+
+services:
+  peer1.nflexorg.exchange.com:
+    extends:
+      file: peer-base.yaml
+      service: peer-base
+    container_name: peer1.nflexorg.exchange.com
+    environment:
+      - CORE_PEER_ID=peer1.nflexorg.exchange.com
+      - CORE_PEER_ADDRESS=peer1.nflexorg.exchange.com:10051
+      - CORE_PEER_LISTENADDRESS=0.0.0.0:10051
+      - CORE_PEER_CHAINCODEADDRESS=peer1.nflexorg.exchange.com:10052
+      - CORE_PEER_CHAINCODELISTENADDRESS=0.0.0.0:10052
+      - CORE_PEER_GOSSIP_BOOTSTRAP=peer0.nflexorg.exchange.com:9051
+      - CORE_PEER_GOSSIP_EXTERNALENDPOINT=peer1.nflexorg.exchange.com:10051
+      - CORE_PEER_LOCALMSPID=NFlexOrgMSP
+      - CORE_LEDGER_STATE_STATEDATABASE=CouchDB
+      - CORE_LEDGER_STATE_COUCHDBCONFIG_COUCHDBADDRESS=couchdb1.nflexorg.exchange.com:5984
+      - CORE_LEDGER_STATE_COUCHDBCONFIG_USERNAME=
+      - CORE_LEDGER_STATE_COUCHDBCONFIG_PASSWORD=
+    depends_on:
+      - couchdb1.nflexorg.exchange.com
+    ports:
+      - 10051:10051
+      # prometheus metrics port
+      - 12443:9443
+    volumes:
+      - ../crypto-config/peerOrganizations/nflexorg.exchange.com/peers/peer1.nflexorg.exchange.com/msp:/etc/hyperledger/fabric/msp
+      - ../crypto-config/peerOrganizations/nflexorg.exchange.com/peers/peer1.nflexorg.exchange.com/tls:/etc/hyperledger/fabric/tls
+      - ../volumes/peer1.nflexorg.exchange.com:/var/hyperledger/production
+
+  couchdb1.nflexorg.exchange.com:
+    container_name: couchdb1.nflexorg.exchange.com
+    image: hyperledger/fabric-couchdb:$HF_TOOL_IMAGE_VERSION
+    environment:
+      - COUCHDB_USER=
+      - COUCHDB_PASSWORD=
+    ports:
+      - 45984:5984
+    volumes:
+      - ../volumes/couchdb1.nflexorg.exchange.com:/opt/couchdb/data
+    networks:
+      - exchange
+
+  cli:
+    container_name: cli
+    image: hyperledger/fabric-tools:$HF_IMAGE_VERSION
+    tty: true
+    stdin_open: true
+    environment:
+      - FABRIC_LOGGING_SPEC=$FABRIC_LOGGING_SPEC
+      - CORE_VM_DOCKER_HOSTCOFIG_NETWORKMODE=exchange-net
+      - GOPATH=/opt/gopath
+      - CORE_VM_ENDPOINT=unix:///host/var/run/docker.sock
+      - CORE_PEER_ID=cli
+      - CORE_PEER_ADDRESS=peer0.nuriorg.exchange.com:7051
+      - CORE_PEER_LOCALMSPID=NuroOrgMSP
+      - CORE_PEER_TLS_ENABLED=true
+      - CORE_PEER_TLS_CERT_FILE=/opt/gopath/src/github.com/hyperledger/fabric/peer/crypto/peerOrganizations/nuriorg.exchange.com/peers/peer0.nuriorg.exchange.com/tls/server.crt
+      - CORE_PEER_TLS_KEY_FILE=/opt/gopath/src/github.com/hyperledger/fabric/peer/crypto/peerOrganizations/nuriorg.exchange.com/peers/peer0.nuriorg.exchange.com/tls/server.key
+      - CORE_PEER_TLS_ROOTCERT_FILE=/opt/gopath/src/github.com/hyperledger/fabric/peer/crypto/peerOrganizations/nuriorg.exchange.com/peers/peer0.nuriorg.exchange.com/tls/ca.crt
+      - CORE_PEER_MSPCONFIGPATH=/opt/gopath/src/github.com/hyperledger/fabric/peer/crypto/peerOrganizations/nuriorg.exchange.com/users/Admin@nuriorg.exchange.com/msp
+    working_dir: /opt/gopath/src/github.com/hyperledger/fabric/peer
+    command: /bin/bash #-c "scripts/scripts.sh exchangecc"
+    volumes:
+        - /var/run/:/host/var/run/
+        - ../chaincode/:/opt/gopath/src/github.com/chaincode
+        - ../scripts/:/opt/gopath/src/github.com/hyperledger/fabric/peer/scripts
+        - ../crypto-config:/opt/gopath/src/github.com/hyperledger/fabric/peer/crypto/
+        - ../channel-artifacts:/opt/gopath/src/github.com/hyperledger/fabric/peer/channel-artifacts
+#        - ./:/opt/gopath/src/github.com/hyperledger/fabric/peer
+    networks:
+      - exchange

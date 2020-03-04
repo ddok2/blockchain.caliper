@@ -56,6 +56,11 @@ class Blockchain {
                 this.bcType = 'booster';
                 this.bcObj = new booster(configPath);
             }
+            else if(config.caliper.blockchain ==='accelerator') {
+                let accelerator = require('../adapters/accelerator/accelerator.js');
+                this.bcType = 'accelerator';
+                this.bcObj = new accelerator(configPath);
+            }
             else {
                 this.bcType = 'unknown';
                 throw new Error('Unknown blockchain type: ' + config.caliper.blockchain);

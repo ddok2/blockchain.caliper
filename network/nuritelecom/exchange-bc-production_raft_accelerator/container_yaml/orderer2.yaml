@@ -1,0 +1,22 @@
+version: '2'
+
+networks:
+  exchange:
+    external:
+      name: exchange-net
+
+services:
+  orderer4.exchange.com:
+    extends:
+      file: orderer-base.yaml
+      service: orderer-base
+    container_name: orderer4.exchange.com
+    environment:
+      - ORDERER_GENERAL_LISTENPORT=11050
+    volumes:
+      - ../crypto-config/ordererOrganizations/exchange.com/orderers/orderer4.exchange.com/msp:/var/hyperledger/orderer/msp
+      - ../crypto-config/ordererOrganizations/exchange.com/orderers/orderer4.exchange.com/tls:/var/hyperledger/orderer/tls
+      - ../volumes/orderer4.exchange.com:/var/hyperledger/production/orderer
+    ports:
+      - 11050:11050
+      - 48443:8443

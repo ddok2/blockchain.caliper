@@ -1,0 +1,39 @@
+---
+test:
+  name: NuriFlex Blockchain Test
+  description: test
+  clients:
+    type: local
+    number: 3
+  rounds:
+    - label: createWallet
+      description: Test description for the register a wallet through the NuriFlex Blockchain
+      txNumber:
+        - 500
+        - 1000
+        - 1500
+      rateControl:
+        - type: fixed-rate
+          opts:
+            tps: 500
+        - type: fixed-rate
+          opts:
+            tps: 1000
+        - type: fixed-rate
+          opts:
+            tps: 1500
+      arguments:
+        money: 10000
+      callback: benchmark/nuriflex/createWallet.js
+monitor:
+  type:
+    - docker
+    - process
+  docker:
+    name:
+      - all
+  process:
+    - command: node
+      arguments: local-client.js
+      multiOutput: avg
+  interval: 1

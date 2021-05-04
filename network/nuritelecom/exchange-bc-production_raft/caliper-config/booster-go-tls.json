@@ -14,7 +14,7 @@
     "cryptodir": "network/nuritelecom/exchange-bc-production_raft/crypto-config",
     "network": {
       "orderer": {
-        "url": "grpcs://0.0.0.0:8050",
+        "url": "grpcs://orderer1.exchange.com:8050",
         "mspid": "OrdererMSP",
         "msp": "network/nuritelecom/exchange-bc-production_raft/crypto-config/ordererOrganizations/exchange.com/msp/",
         "server-hostname": "orderer1.exchange.com",
@@ -25,12 +25,12 @@
         "mspid": "NuriOrgMSP",
         "msp": "network/nuritelecom/exchange-bc-production_raft/crypto-config/peerOrganizations/nuriorg.exchange.com/msp/",
         "ca": {
-          "url": "http://0.0.0.0:17054",
+          "url": "http://ca.nuriorg.exchange.com:17054",
           "name": "ca.nuriorg.exchange.com"
         },
         "peer1": {
-          "requests": "grpcs://0.0.0.0:7051",
-          "events": "grpcs://0.0.0.0:7053",
+          "requests": "grpcs://peer0.nuriorg.exchange.com:7051",
+          "events": "grpcs://peer0.nuriorg.exchange.com:7053",
           "server-hostname": "peer0.nuriorg.exchange.com",
           "tls_cacerts": "network/nuritelecom/exchange-bc-production_raft/crypto-config/peerOrganizations/nuriorg.exchange.com/peers/peer0.nuriorg.exchange.com/tls/ca.crt"
         }

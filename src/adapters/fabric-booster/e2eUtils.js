@@ -914,17 +914,18 @@ async function invokebycontext(context, id, version, args, timeout) {
   let form = null;
 
   switch (proposalRequest.fcn) {
-    case 'registerMember':
-      url = '/api/v1/transaction/registeruser';
+    case 'createWallet':
+      url = '/api/v2/wallet';
       form = {
-        txID: args[0],
-        memberId: args[1],
-        vsCode: args[2],
-        countryCode: args[3],
-        currencyCode: args[4],
-        memberRole: args[5],
-        walletAddress: args[6],
-        txTime: args[7],
+        wallet_id: args[0],
+        balance: args[1],
+        user_id: args[2],
+        user_name: args[3],
+        wallet_status: args[4],
+        created: args[5],
+        token_id: args[6],
+        token_name: args[7],
+        token_type: args[8],
       };
       break;
 
@@ -957,11 +958,11 @@ async function invokebycontext(context, id, version, args, timeout) {
       method: 'POST',
       path: url,
       headers: {
-        'Content-Type': 'application/x-www-form-urlencoded',
+        'Content-Type': 'application/json',
       },
     };
 
-    const postData = qs.stringify(form);
+    const postData = JSON.stringify(form);
 
     const req = client.request(options);
     req.setTimeout(timeout);

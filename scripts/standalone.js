@@ -76,12 +76,12 @@ async function start() {
         absConfigFile =
             path.join(__dirname,
                 '/../',
-                'network/nuritelecom/exchange-bc-production_raft' +
+                'network/nuriflex/v2.0' +
                 '/caliper-config/host-config.yaml');
         absNetworkFile =
             path.join(__dirname,
                 '/../',
-                'network/nuritelecom/exchange-bc-production_raft' +
+                'network/nuriflex/v2.0' +
                 '/caliper-config/booster-go-tls.json');
         break;
 

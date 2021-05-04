@@ -1,0 +1,90 @@
+{
+  "caliper": {
+    "blockchain": "booster"
+  },
+  "booster": {
+    "hostname": "txbooster",
+    "port": "8080"
+  },
+  "fabric": {
+    "cryptodir": "network/nuriflex/crypto-config",
+    "network": {
+      "orderer": {
+        "url": "grpcs://orderer1.nuriflex.com:17050",
+        "mspid": "OrdererMSP",
+        "msp": "network/nuriflex/crypto-config/ordererOrganizations/nuriflex.com/msp/",
+        "server-hostname": "orderer1.nuriflex.com",
+        "tls_cacerts": "network/nuriflex/crypto-config/ordererOrganizations/nuriflex.com/orderers/orderer1.nuriflex.com/tls/ca.crt"
+      },
+      "nuriorg": {
+        "name": "NuriOrg",
+        "mspid": "NuriOrgMSP",
+        "msp": "network/nuriflex/crypto-config/peerOrganizations/nuriorg.nuriflex.com/msp/",
+        "ca": {
+          "url": "http://ca.nuriorg.nuriflex.com:17054",
+          "name": "ca.nuriorg.nuriflex.com"
+        },
+        "peer1": {
+          "requests": "grpcs://peer0.nuriorg.nuriflex.com:7051",
+          "events": "grpcs://peer0.nuriorg.nuriflex.com:7053",
+          "server-hostname": "peer0.nuriorg.nuriflex.com",
+          "tls_cacerts": "network/nuriflex/crypto-config/peerOrganizations/nuriorg.nuriflex.com/peers/peer0.nuriorg.nuriflex.com/tls/ca.crt"
+        }
+      }
+    },
+    "channel": [
+      {
+        "name": "nuriflex-channel",
+        "deployed": false,
+        "config": "",
+        "organizations": [
+          "nuriorg"
+        ]
+      }
+    ],
+    "chaincodes": [
+      {
+        "id": "nuriflex",
+        "path": "",
+        "language": "golang",
+        "version": "1.0",
+        "channel": "nuriflex-channel"
+      }
+    ],
+    "endorsement-policy": {
+      "identities": [
+        {
+          "role": {
+            "name": "member",
+            "mspId": "NuriOrgMSP"
+          }
+        },
+        {
+          "role": {
+            "name": "member",
+            "mspId": "NFlexOrgMSP"
+          }
+        }
+      ],
+      "policy": {
+        "2-of": [
+          {
+            "signed-by": 0
+          },
+          {
+            "signed-by": 1
+          }
+        ]
+      }
+    },
+    "context": {
+      "createWallet": "nuriflex-channel"
+    }
+  },
+  "info": {
+    "Version": "2.2.2",
+    "Size": "2 Orgs with 4 Peers with TxBooster",
+    "Orderer": "5 Orderers",
+    "Distribution": "NuriFlex Blockchain with TxBooster"
+  }
+}
